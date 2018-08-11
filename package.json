@@ -1,0 +1,21 @@
+{
+  "name": "video-browser2",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --watch routes ./bin/www",
+    "preinstall": "npm install -g nodemon"
+  },
+  "dependencies": {
+    "config": "^2.0.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.16.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "http-errors": "~1.6.2",
+    "morgan": "~1.9.0",
+    "pug": "2.0.0-beta11",
+    "stylus": "0.54.5"
+  },
+  "devDependencies": {}
+}
