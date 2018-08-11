@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h1>{{ basename(path) }}</h1>
-    <video-player :path="path" />
+    <video-player :path="path"></video-player>
+    <h2>{{ basename(path) }}</h2>
   </div>
 </template>
 
@@ -19,5 +19,11 @@ module.exports = {
 }
 </script>
 
-<style>
+<style scoped>
+  h2 {
+    padding: 0;
+    margin: 16px;
+    font-size: 18px;
+    font-weight: normal;
+  }
 </style>

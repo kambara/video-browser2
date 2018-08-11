@@ -2,9 +2,12 @@
   <div>
     <nav>
       <div v-if="parentDir != null">
-        <router-link :to="linkToList(parentDir)">
-          Back
+        <router-link :to="linkToList(parentDir)" class="back-button">
+          <i class="fas fa-arrow-left"></i>
         </router-link>
+        <h2>
+          {{ basename(relativePath) }}
+        </h2>
       </div>
     </nav>
     <ul>
@@ -21,8 +24,7 @@
         </div>
       </li>
     </ul>
-  </div>
-</template>
+  </div></template>
 
 <script>
 module.exports = {
@@ -70,5 +72,29 @@ module.exports = {
 }
 </script>
 
-<style>
+<style scoped>
+  nav {
+    margin: 16px;
+    font-size: 20px;
+  }
+  .back-button {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    margin-right: 8px;
+  }
+  h2 {
+    display: inline-block;
+        margin: 0px;
+    padding: 0px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 20px;
+
+  }
+  li {
+    font-size: 16px;
+  }
 </style>
