@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon --watch routes ./bin/www",
-    "preinstall": "npm install -g nodemon"
+    "start": "nodemon --watch routes ./bin/www"
   },
   "dependencies": {
     "config": "^2.0.1",
