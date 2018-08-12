@@ -228,7 +228,7 @@ module.exports = {
 }
 </script>
 
-<style>
+<style scoped>
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s;
   }
@@ -247,6 +247,7 @@ module.exports = {
     width: 100%;
     padding: 16px 16px;
     box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.3);
   }
   input[type="range"] {
     -webkit-appearance: none;

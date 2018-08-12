@@ -24,7 +24,8 @@
         </div>
       </li>
     </ul>
-  </div></template>
+  </div>
+</template>
 
 <script>
 module.exports = {
@@ -92,7 +93,6 @@ module.exports = {
     height: 32px;
     line-height: 32px;
     font-size: 20px;
-
   }
   li {
     font-size: 16px;
