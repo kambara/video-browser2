@@ -20,6 +20,9 @@ module.exports = {
     VideoPlayer: httpVueLoader('/javascripts/VideoPlayer.vue'),
     ThumbnailsList: httpVueLoader('/javascripts/ThumbnailsList.vue')
   },
+  created: function() {
+    
+  },
   mixins: [VideoUtil],
   methods: {
     onGenerateThumbnailsButtonClick: async function(event) {

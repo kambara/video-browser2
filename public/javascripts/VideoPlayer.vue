@@ -48,6 +48,8 @@
             {{ currentTimeSec }}
             /
             {{ duration }}
+
+            {{ sharedState.message }}
           </span>
         </div>
       </div>
@@ -77,6 +79,7 @@ module.exports = {
       volume: 0.5,
       width: 0,
       height: 0,
+      sharedState: window.store.state
     }
   },
   created: async function() {
@@ -109,6 +112,12 @@ module.exports = {
         'fa-expand': !this.isFullscreen,
         'fa-compress': this.isFullscreen
       }
+    }
+  },
+  watch: {
+    'sharedState.startVideoAt': function() {
+      this.currentTime = this.sharedState.startVideoAt * 1000
+      this.seek()
     }
   },
   methods: {

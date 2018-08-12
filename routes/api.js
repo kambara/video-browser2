@@ -35,8 +35,9 @@ router.get('/video-info/*', function(req, res, next) {
   video.getMetadata((err, metadata) => {
     res.json({
       duration: metadata.format.duration,
-      tiledImage: video.getTiledImagePath(),
-      existTiledImage: video.existTiledImage()
+      tiledImagePath: video.getTiledImageRelativePath(),
+      existTiledImage: video.existTiledImage(),
+      interval: 10
     })
   })
 })
@@ -79,12 +80,13 @@ class Video {
   basename() {
     return path.basename(this.relativePath)
   }
+
+  getTiledImageRelativePath() {
+    return path.join('/thumbnails', this.md5() + '.jpg')
+  }
   
   getTiledImagePath() {
-    return path.join(
-      __dirname,
-      '../data/thumbnails',
-      this.md5() + '.jpg')
+    return path.join(__dirname, '../data/public', this.getTiledImageRelativePath())
   }
 
   existTiledImage() {
@@ -92,10 +94,7 @@ class Video {
   }
 
   getThumbnailsDirPath() {
-    return path.join(
-      __dirname,
-      '../data/thumbnails',
-      this.md5())
+    return path.join(__dirname, '../data/public/thumbnails', this.md5())
   }
 
   getThumbnailImagePath(time) {
@@ -139,7 +138,7 @@ class Video {
       .on('end', (stdout, stderr) => {
         if (time + interval > duration) {
           console.log('Finish generating all thumbnails:', this.getThumbnailsDirPath())
-          // Generate tiled image at last
+          // Generate tiled image
           this.generateTiledImage(duration, interval)
         } else {
           // Generate next image
@@ -174,6 +173,7 @@ class Video {
       .then(image => {
         baseImage.blit(image, x, y)
         if (currentIndex == imageCount) {
+          console.log('Saving')
           baseImage.quality(90)
           baseImage.write(this.getTiledImagePath())
           console.log('Finish generating tiled image:', this.getTiledImagePath())
