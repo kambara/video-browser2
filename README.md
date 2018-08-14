@@ -1,8 +1,12 @@
 
 ## Install
 
+### Prerequirements
+
 - Node.js
 - FFmpeg
+
+### npm install
 
     npm install -g nodemon
     npm install
@@ -15,3 +19,23 @@
 ## Run
 
     DEBUG=video-browser2:* npm start
+
+## TODO
+
+優先度高
+
+- h.264とaacは無変換
+- Webpack
+- 一覧のサムネイル表示
+- 動画領域をより大きくする
+- サムネイルリストから再生
+
+優先度中
+
+- シークバーサムネイル
+- ランダム表示
+- 検索
+
+優先度低
+
+- サムネイル進捗表示

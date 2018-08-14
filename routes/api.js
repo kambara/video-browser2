@@ -45,18 +45,28 @@ router.get('/video-info/*', function(req, res, next) {
 router.get('/video-file/*', function(req, res, next) {
   const time = req.query.time ? parseInt(req.query.time) : 0
   const video = new Video(req.params[0])
-  res.contentType('video/mp4')
-  ffmpeg(video.getVideoPath())
-    .seekInput(time)
-    .format('mp4')
-    .videoCodec('libx264')
-    .videoBitrate('3072k')
-    .audioCodec('aac')
-    .audioBitrate('128k')
-    .outputOptions(['-movflags frag_keyframe+empty_moov'])
-    .on('end', () => { console.log('Converted succesfully') })
-    .on('error', (err) => { console.log(err.message) })
-    .pipe(res, {end: true})
+  video.getMetadata((err, metadata) => {
+    // console.log(metadata)
+    const sourceCodecs = metadata.streams.reduce((obj, stream) => {
+      obj[stream.codec_type] = stream.codec_name
+      return obj
+    }, {})
+    const videoCodec = (sourceCodecs.video == 'h264') ? 'copy' : 'libx264'
+    const audioCodec = (sourceCodecs.audio.match(/mp3|aac/)) ? 'copy' : 'aac'
+    res.contentType('video/mp4')
+    ffmpeg(video.getVideoPath())
+      .seekInput(time)
+      .format('mp4')
+      .videoCodec(videoCodec)
+      // .videoBitrate(3 * 1024)
+      .audioCodec(audioCodec)
+      .audioBitrate(128)
+      .outputOptions(['-movflags frag_keyframe+empty_moov'])
+      .on('end', () => { console.log('Converted succesfully') })
+      .on('error', (err) => { console.log(err.message) })
+      .pipe(res, { end: true })
+  })
+
 })
 
 router.get('/generate-thumbnails/*', function(req, res, next) {
