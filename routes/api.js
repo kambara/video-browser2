@@ -61,19 +61,10 @@ router.get('/video-file/*', function(req, res, next) {
       .videoBitrate(3 * 1024)
       .audioCodec(audioCodec)
       .audioBitrate(128)
-      .outputOptions([
-        '-movflags frag_keyframe+empty_moov'
-      ])
-      .on('codecData', function(data) {
-        console.log('Input format:', data.format)
-        console.log('Input video:', data.video_details)
-        console.log('Input audio:', data.audio_details)
-      })
-      .on('end', () => { console.log('Converted succesfully') })
-      .on('stderr', (stderr) => {
-        console.log('stderr:', stderr)
-      })
-      .on('error', (err) => { console.log('error:', err.message) })
+      .outputOptions(['-movflags frag_keyframe+empty_moov'])
+      .on('end', () => console.log('Converted succesfully'))
+      .on('stderr', stderr => console.log('    ffmpeg:', stderr))
+      .on('error', err => console.log('Error:', err.message))
       .pipe(res, { end: true })
   })
 })
