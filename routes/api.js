@@ -51,10 +51,8 @@ router.get('/video-file/*', function(req, res, next) {
       obj[stream.codec_type] = stream.codec_name
       return obj
     }, {})
-    // const videoCodec = (sourceCodecs.video == 'h264') ? 'copy' : 'libx264'
-    // const audioCodec = (sourceCodecs.audio.match(/mp3|aac/)) ? 'copy' : 'aac'
-    const videoCodec = 'libx264'
-    const audioCodec = 'aac'
+    const videoCodec = (sourceCodecs.video == 'h264') ? 'copy' : 'libx264'
+    const audioCodec = (sourceCodecs.audio.match(/mp3|aac/)) ? 'copy' : 'aac'
     res.contentType('video/mp4')
     ffmpeg(video.getVideoPath())
       .seekInput(time)
@@ -64,8 +62,7 @@ router.get('/video-file/*', function(req, res, next) {
       .audioCodec(audioCodec)
       .audioBitrate(128)
       .outputOptions([
-        '-movflags frag_keyframe+empty_moov',
-        '-max_muxing_queue_size 1024'
+        '-movflags frag_keyframe+empty_moov'
       ])
       .on('codecData', function(data) {
         console.log('Input format:', data.format)
