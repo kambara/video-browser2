@@ -28,7 +28,9 @@
 </template>
 
 <script>
-module.exports = {
+import VideoUtil from './VideoUtil'
+
+export default {
   data: function() {
     return {
       relativePath: null,

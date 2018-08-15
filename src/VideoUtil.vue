@@ -1,4 +1,5 @@
-const VideoUtil = {
+<script>
+export default {
   methods: {
     basename: function(path) {
       const elements = path.split('/')
@@ -13,11 +14,4 @@ const VideoUtil = {
     }
   }
 }
-
-const TestMixin = {
-  methods: {
-    hoge: function() {
-      console.log('hoge')
-    }
-  }
-}
+</script>

@@ -10,15 +10,19 @@
 </template>
 
 <script>
-module.exports = {
+import VideoPlayer from './VideoPlayer'
+import ThumbnailsList from './ThumbnailsList'
+import VideoUtil from './VideoUtil'
+
+export default {
   data: function () {
     return {
       path: this.$route.params[0] || ''
     }
   },
   components: {
-    VideoPlayer: httpVueLoader('/javascripts/VideoPlayer.vue'),
-    ThumbnailsList: httpVueLoader('/javascripts/ThumbnailsList.vue')
+    VideoPlayer: VideoPlayer,
+    ThumbnailsList: ThumbnailsList
   },
   created: function() {
     

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "predev": "webpack --env=dev",
     "start": "nodemon --watch routes ./bin/www"
   },
   "dependencies": {
@@ -18,5 +19,16 @@
     "pug": "2.0.0-beta11",
     "stylus": "0.54.5"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@babel/core": "^7.0.0-rc.1",
+    "@babel/preset-env": "^7.0.0-rc.1",
+    "babel-loader": "^8.0.0-beta",
+    "css-loader": "^1.0.0",
+    "vue": "^2.5.17",
+    "vue-loader": "^15.3.0",
+    "vue-router": "^3.0.1",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
+  }
 }
