@@ -63,7 +63,10 @@ router.get('/video-file/*', function(req, res, next) {
       .videoBitrate(3 * 1024)
       .audioCodec(audioCodec)
       .audioBitrate(128)
-      .outputOptions(['-movflags frag_keyframe+empty_moov'])
+      .outputOptions([
+        '-movflags frag_keyframe+empty_moov',
+        '-max_muxing_queue_size 1024'
+      ])
       .on('codecData', function(data) {
         console.log('Input format:', data.format)
         console.log('Input video:', data.video_details)
