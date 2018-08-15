@@ -51,14 +51,16 @@ router.get('/video-file/*', function(req, res, next) {
       obj[stream.codec_type] = stream.codec_name
       return obj
     }, {})
-    const videoCodec = (sourceCodecs.video == 'h264') ? 'copy' : 'libx264'
-    const audioCodec = (sourceCodecs.audio.match(/mp3|aac/)) ? 'copy' : 'aac'
+    // const videoCodec = (sourceCodecs.video == 'h264') ? 'copy' : 'libx264'
+    // const audioCodec = (sourceCodecs.audio.match(/mp3|aac/)) ? 'copy' : 'aac'
+    const videoCodec = 'libx264'
+    const audioCodec = 'aac'
     res.contentType('video/mp4')
     ffmpeg(video.getVideoPath())
       .seekInput(time)
       .format('mp4')
       .videoCodec(videoCodec)
-      // .videoBitrate(3 * 1024)
+      .videoBitrate(3 * 1024)
       .audioCodec(audioCodec)
       .audioBitrate(128)
       .outputOptions(['-movflags frag_keyframe+empty_moov'])
@@ -66,7 +68,6 @@ router.get('/video-file/*', function(req, res, next) {
       .on('error', (err) => { console.log(err.message) })
       .pipe(res, { end: true })
   })
-
 })
 
 router.get('/generate-thumbnails/*', function(req, res, next) {
