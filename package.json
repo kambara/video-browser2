@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "predev": "webpack --env=dev",
+    "predev": "webpack",
+    "dev": "nodemon --watch routes ./bin/www & webpack --watch",
     "start": "nodemon --watch routes ./bin/www"
   },
   "dependencies": {

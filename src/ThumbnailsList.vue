@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import store from './store'
+
 export default {
   props: {
     path: String
@@ -24,7 +26,7 @@ export default {
       tiledImagePath: null,
       duration: null,
       interval: 10,
-      sharedState: window.store.state
+      sharedState: store.state
     }
   },
   created: async function() {

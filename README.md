@@ -19,13 +19,15 @@
 ## Run
 
     DEBUG=video-browser2:* npm start
+    DEBUG=video-browser2:* npm run dev
 
 ## TODO
 
 優先度高
 
-- h.264とaacは無変換
 - Webpack
+    - LiveReload
+    - Lint
 - 一覧のサムネイル表示
 - 動画領域をより大きくする
 - サムネイルリストから再生

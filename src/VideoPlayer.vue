@@ -58,6 +58,8 @@
 </template>
 
 <script>
+import store from './store'
+
 export default {
   props: {
     path: String
@@ -79,7 +81,7 @@ export default {
       volume: 0.5,
       width: 0,
       height: 0,
-      sharedState: window.store.state
+      sharedState: store.state
     }
   },
   created: async function() {

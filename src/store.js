@@ -1,4 +1,4 @@
-window.store = {
+const store = {
   state: {
     startVideoAt: null
   },
@@ -7,3 +7,5 @@ window.store = {
     this.state.startVideoAt = time
   }
 }
+
+export default store
