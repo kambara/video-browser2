@@ -11,7 +11,10 @@ div
 </template>
 
 <script>
-import store from './store'
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
 
 export default {
   props: {
@@ -22,7 +25,6 @@ export default {
       tiledImagePath: null,
       duration: null,
       interval: 10,
-      sharedState: store.state
     }
   },
   created: async function() {
@@ -46,7 +48,7 @@ export default {
     onThumbnailClick: function(event) {
       const time = event.target.getAttribute('data-time')
       console.log(time)
-      window.store.startVideoAt(parseInt(time))
+      $store.dispatch('startVideoAt', parseInt(time))
     }
   }
 }
