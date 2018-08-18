@@ -27,7 +27,7 @@ export default {
     SceneList: SceneList
   },
   created: function() {
-    this.$store.dispatch('setVideoPath', this.path)
+    this.$store.dispatch('initVideo', this.path)
   },
   mixins: [VideoUtil],
   methods: {

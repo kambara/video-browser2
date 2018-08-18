@@ -70,6 +70,11 @@ export default {
     window.addEventListener('resize', this.onWindowResize)
   },
   beforeDestroy: function() {
+    this.pause()
+    if (this.videoElement) {
+      this.videoElement.removeAttribute('src')
+      this.videoElement.load()
+    }
     window.removeEventListener('resize', this.onWindowResize)
   },
   computed: {

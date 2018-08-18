@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
-import VideoList from './VideoList'
-import Video from './Video'
 import store from './store'
+import VideoList from './components/VideoList'
+import Video from './components/Video'
 
 Vue.use(Vuex)
 Vue.use(VueRouter)
