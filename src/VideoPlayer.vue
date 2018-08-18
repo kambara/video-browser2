@@ -4,11 +4,12 @@
   :style="{ width: width+'px', height: height+'px' }")
   video(
     type='video/mp4'
-    :src='src'
+    :src='$store.getters.src'
     :autoplay='isAutoPlay'
     :width='width'
     :height='height'
     @canplay='onVideoCanPlay'
+    @loadstart='onVideoLoadStart'
     @playing='updatePaused'
     @pause='updatePaused'
     @ended='onVideoEnded')
@@ -17,7 +18,7 @@
       input.seek-bar(
         type='range'
         :value='currentTimeSec'
-        :max='duration'
+        :max='$store.state.duration'
         @input='onSeekBarInput'
         @change='onSeekBarChange')
       div
@@ -34,7 +35,7 @@
         span.time
           | {{ currentTimeSec }}
           | /
-          | {{ duration }}
+          | {{ $store.state.duration }}
 </template>
 
 <script>
@@ -44,13 +45,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default {
-  props: {
-    path: String
-  },
   data: function () {
     return {
-      src: '',
-      duration: 0,
       isAutoPlay: true,
       loaded: false,
       paused: true,
@@ -67,12 +63,7 @@ export default {
     }
   },
   created: async function() {
-    const response = await fetch(`/api/video-info/${this.path}`)
-    const json = await response.json()
-    this.duration = Math.floor(json.duration)
     setInterval(() => this.updateTime(), 100)
-    this.seek()
-    this.hideControlLater()
   },
   mounted: function() {
     this.onWindowResize()
@@ -100,16 +91,10 @@ export default {
   },
   watch: {
     '$store.state.videoStartTime': function() {
-      this.currentTime = this.$store.state.videoStartTime * 1000
-      this.seek()
+      this.currentTime = this.$store.state.videoStartTime
     }
   },
   methods: {
-    seek: function() {
-      this.loaded = false
-      const sec = Math.floor(this.currentTime / 1000)
-      this.src = `/api/video-file/${this.path}?time=${sec}`
-    },
     play: function() {
       if (this.videoElement) {
         this.videoElement.play()
@@ -132,6 +117,9 @@ export default {
     //
     // Video Event
     //
+    onVideoLoadStart: function() {
+      this.loaded = false
+    },
     onVideoCanPlay: function(event) {
       if (!this.videoElement) {
         this.videoElement = event.target
@@ -171,7 +159,7 @@ export default {
     },
     onSeekBarChange: function(event) {
       this.currentTime = event.target.value * 1000
-      this.seek()
+      this.$store.dispatch('startVideoAt', this.currentTime)
       this.seeking = false
     },
     //
@@ -284,6 +272,8 @@ export default {
       cursor pointer
       &:hover
         background-color rgba(0, 0, 0, 0.5)
+      &[disabled]
+        opacity 0.4
       &.play-button
         width 56px
       &.fullscreen-button

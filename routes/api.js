@@ -35,8 +35,7 @@ router.get('/video-info/*', function(req, res) {
   video.getMetadata((err, metadata) => {
     res.json({
       duration: metadata.format.duration,
-      tiledImagePath: video.getTiledImageRelativePath(),
-      existTiledImage: video.existTiledImage(),
+      allScenesImagePath: video.getAllScenesImageRelativePath(),
       interval: 10
     })
   })
@@ -80,7 +79,7 @@ class Video {
     this.relativePath = relativePath
     this.thumbnailWidth = 160
     this.thumbnailHeight = 90
-    this.tiledImageColumns = 10
+    this.allScenesImageColumns = 10
   }
 
   getVideoPath() {
@@ -91,16 +90,19 @@ class Video {
     return path.basename(this.relativePath)
   }
 
-  getTiledImageRelativePath() {
+  getAllScenesImageRelativePath() {
     return path.join('/thumbnails', this.md5() + '.jpg')
   }
   
-  getTiledImagePath() {
-    return path.join(__dirname, '../data/public', this.getTiledImageRelativePath())
+  getAllScenesImagePath() {
+    return path.join(
+      __dirname,
+      '../data/public',
+      this.getAllScenesImageRelativePath())
   }
 
-  existTiledImage() {
-    return fs.existsSync(this.getTiledImagePath())
+  existAllScenesImage() {
+    return fs.existsSync(this.getAllScenesImagePath())
   }
 
   getThumbnailsDirPath() {
@@ -132,24 +134,38 @@ class Video {
   }
 
   _generateThumbnails(duration, interval, time) {
-    console.log(`Thumanbil: ${time} / ${duration} - ${this.basename()}`)
-    const scaleOptions =
-      `iw*(${this.thumbnailHeight}/ih)*sar:${this.thumbnailHeight},` +
-      `pad=${this.thumbnailWidth}:${this.thumbnailHeight}:(ow-iw)/2:(oh-ih)/2`
+    console.log(`Thumbnail: ${time} / ${duration} - ${this.basename()}`)
     ffmpeg(this.getVideoPath())
       .seekInput(time)
       .format('image2')
       .noAudio()
+      .videoFilters([
+        {
+          filter: 'scale',
+          options: [
+            `min(trunc(oh*a*sar/2)*2, ${this.thumbnailWidth})`,
+            this.thumbnailHeight
+          ]
+        },
+        {
+          filter: 'pad',
+          options: [
+            this.thumbnailWidth,
+            this.thumbnailHeight,
+            '(ow-iw)/2',
+            '(oh-ih)/2'
+          ]
+        }
+      ])
       .outputOptions([
         '-vframes 1',
         '-vsync 0',
-        `-vf scale=${scaleOptions}`
       ])
       .on('end', () => {
         if (time + interval > duration) {
           console.log('Finish generating all thumbnails:', this.getThumbnailsDirPath())
-          // Generate tiled image
-          this.generateTiledImage(duration, interval)
+          // Generate all scenes image
+          this.generateAllScenesImage(duration, interval)
         } else {
           // Generate next image
           this._generateThumbnails(duration, interval, time + interval)
@@ -158,15 +174,16 @@ class Video {
       .on('error', (err) => {
         console.log('Cannot create thumbnails: ' + err.message)
       })
+      // .on('stderr', stderr => console.log('    ffmpeg:', stderr))
       .save(this.getThumbnailImagePath(time))
   }
 
-  generateTiledImage(duration, interval) {
+  generateAllScenesImage(duration, interval) {
     console.log('Generate base image')
     duration = Math.floor(duration)
     const imageCount = Math.floor(duration / interval)
-    const rows = Math.ceil(imageCount / this.tiledImageColumns)
-    const width = this.thumbnailWidth * this.tiledImageColumns
+    const rows = Math.ceil(imageCount / this.allScenesImageColumns)
+    const width = this.thumbnailWidth * this.allScenesImageColumns
     const height = this.thumbnailHeight * rows
     new Jimp(width, height, (err, image) => {
       console.log(imageCount, interval, image, 0)
@@ -175,18 +192,18 @@ class Video {
   }
 
   _addToBaseImage(imageCount, interval, baseImage, currentIndex) {
-    console.log('Add to tiled image:', `${currentIndex} / ${imageCount} - ${this.basename()}`)
+    console.log('Add to base image:', `${currentIndex} / ${imageCount} - ${this.basename()}`)
     const imagePath = this.getThumbnailImagePath(currentIndex * interval)
-    const x = 160 * (currentIndex % this.tiledImageColumns)
-    const y = 90 * Math.floor(currentIndex / this.tiledImageColumns)
+    const x = 160 * (currentIndex % this.allScenesImageColumns)
+    const y = 90 * Math.floor(currentIndex / this.allScenesImageColumns)
     Jimp.read(imagePath)
       .then(image => {
         baseImage.blit(image, x, y)
         if (currentIndex == imageCount) {
           console.log('Saving')
           baseImage.quality(90)
-          baseImage.write(this.getTiledImagePath())
-          console.log('Finish generating tiled image:', this.getTiledImagePath())
+          baseImage.write(this.getAllScenesImagePath())
+          console.log('Finish generating image:', this.getAllScenesImagePath())
         } else {
           this._addToBaseImage(imageCount, interval, baseImage, currentIndex + 1)
         }

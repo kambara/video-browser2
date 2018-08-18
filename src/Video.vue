@@ -1,16 +1,20 @@
 <template lang="pug">
 div
-  video-player(:path='path')
+  video-player
   h2 {{ basename(path) }}
   button(@click='onGenerateThumbnailsButtonClick')
     | Generate Thumbnails
-  thumbnails-list(:path='path')
+  scene-list
 </template>
 
 <script>
+import Vue from 'vue'
+import Vuex from 'vuex'
 import VideoPlayer from './VideoPlayer'
-import ThumbnailsList from './ThumbnailsList'
+import SceneList from './SceneList'
 import VideoUtil from './VideoUtil'
+
+Vue.use(Vuex)
 
 export default {
   data: function () {
@@ -20,15 +24,14 @@ export default {
   },
   components: {
     VideoPlayer: VideoPlayer,
-    ThumbnailsList: ThumbnailsList
+    SceneList: SceneList
   },
   created: function() {
-    
+    this.$store.dispatch('setVideoPath', this.path)
   },
   mixins: [VideoUtil],
   methods: {
     onGenerateThumbnailsButtonClick: async function() {
-      console.log('gen thumb')
       const response = await fetch(`/api/generate-thumbnails/${this.path}`)
       const json = await response.json()
       console.log(json)
