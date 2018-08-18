@@ -35,11 +35,13 @@
           | {{ currentTimeSec }}
           | /
           | {{ duration }}
-          | {{ sharedState.message }}
 </template>
 
 <script>
-import store from './store'
+import Vue from 'vue'
+import Vuex from 'vuex'
+
+Vue.use(Vuex)
 
 export default {
   props: {
@@ -62,7 +64,6 @@ export default {
       volume: 0.5,
       width: 0,
       height: 0,
-      sharedState: store.state
     }
   },
   created: async function() {
@@ -95,11 +96,11 @@ export default {
         'fa-expand': !this.isFullscreen,
         'fa-compress': this.isFullscreen
       }
-    }
+    },
   },
   watch: {
-    'sharedState.startVideoAt': function() {
-      this.currentTime = this.sharedState.startVideoAt * 1000
+    '$store.state.videoStartTime': function() {
+      this.currentTime = this.$store.state.videoStartTime * 1000
       this.seek()
     }
   },

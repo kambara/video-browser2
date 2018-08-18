@@ -1,8 +1,11 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import VideoList from './VideoList'
 import Video from './Video'
+import store from './store'
 
+Vue.use(Vuex)
 Vue.use(VueRouter)
 
 const router = new VueRouter({
@@ -24,5 +27,6 @@ const router = new VueRouter({
 })
 
 new Vue({
-  router: router
+  router: router,
+  store
 }).$mount('#app')

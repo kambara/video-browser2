@@ -1,11 +1,21 @@
-const store = {
+import Vuex from 'vuex'
+
+const store = new Vuex.Store({
   state: {
-    startVideoAt: null
+    videoStartTime: 0
   },
-  startVideoAt(time) {
-    console.log('startAt action:', time)
-    this.state.startVideoAt = time
+  mutations: {
+    setVideoStartTime(state, time) {
+      console.log('setVideoStartTime:', time)
+      state.videoStartTime = time
+    }
+  },
+  actions: {
+    startVideoAt(context, time) {
+      console.log('startVideoAt:', time)
+      context.commit('setVideoStartTime', time)
+    }
   }
-}
+})
 
 export default store
