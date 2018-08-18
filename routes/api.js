@@ -2,13 +2,13 @@ const express = require('express')
 const router = express.Router()
 const fs = require('fs')
 const path = require('path')
-const crypto = require("crypto")
+const crypto = require('crypto')
 const ffmpeg = require('fluent-ffmpeg')
 const config = require('config')
 const mkpath = require('mkpath')
 const Jimp = require('jimp')
 
-router.get('/list/*', function(req, res, next) {  
+router.get('/list/*', function(req, res) {  
   const relativeDirPath = req.params[0]
   const dirPath = path.join(config.videoRoot, relativeDirPath)
   fs.readdir(dirPath, (err, entries) => {
@@ -30,7 +30,7 @@ router.get('/list/*', function(req, res, next) {
   })
 })
 
-router.get('/video-info/*', function(req, res, next) {
+router.get('/video-info/*', function(req, res) {
   const video = new Video(req.params[0])
   video.getMetadata((err, metadata) => {
     res.json({
@@ -42,7 +42,7 @@ router.get('/video-info/*', function(req, res, next) {
   })
 })
 
-router.get('/video-file/*', function(req, res, next) {
+router.get('/video-file/*', function(req, res) {
   const time = req.query.time ? parseInt(req.query.time) : 0
   const video = new Video(req.params[0])
   video.getMetadata((err, metadata) => {
@@ -69,7 +69,7 @@ router.get('/video-file/*', function(req, res, next) {
   })
 })
 
-router.get('/generate-thumbnails/*', function(req, res, next) {
+router.get('/generate-thumbnails/*', function(req, res) {
   const video = new Video(req.params[0])
   video.generateThumbnails()
   res.json({})
@@ -112,7 +112,7 @@ class Video {
   }
 
   md5() {
-    const hash = crypto.createHash("md5")
+    const hash = crypto.createHash('md5')
     hash.update(this.relativePath)
     return hash.digest('hex')
   }
@@ -145,7 +145,7 @@ class Video {
         '-vsync 0',
         `-vf scale=${scaleOptions}`
       ])
-      .on('end', (stdout, stderr) => {
+      .on('end', () => {
         if (time + interval > duration) {
           console.log('Finish generating all thumbnails:', this.getThumbnailsDirPath())
           // Generate tiled image
@@ -155,7 +155,7 @@ class Video {
           this._generateThumbnails(duration, interval, time + interval)
         }
       })
-      .on('error', (err, stdout, stderr) => {
+      .on('error', (err) => {
         console.log('Cannot create thumbnails: ' + err.message)
       })
       .save(this.getThumbnailImagePath(time))
