@@ -5,11 +5,12 @@
 
 - Node.js
 - FFmpeg
+- Yarn
 
-### npm install
+### Install
 
     npm install -g nodemon
-    npm install
+    yarn install
 
 ## Config
 
@@ -18,8 +19,18 @@
 
 ## Run
 
-    DEBUG=video-browser2:* npm start
+### Dev mode
+
     DEBUG=video-browser2:* npm run dev
+
+In order to enable livereload, install browser extension
+
+- [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
+- [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remotelivereload/)
+
+### Production mode
+
+TBD
 
 ## TODO
 
@@ -28,6 +39,7 @@
 - Webpack
     - LiveReload
     - Lint
+- pug
 - 一覧のサムネイル表示
 - 動画領域をより大きくする
 - サムネイルリストから再生

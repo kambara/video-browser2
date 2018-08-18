@@ -1,5 +1,6 @@
 const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const LiveReloadPlugin = require('webpack-livereload-plugin')
 
 module.exports = {
   mode: 'development',
@@ -38,6 +39,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new LiveReloadPlugin()
   ]
 }
