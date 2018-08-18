@@ -1,17 +1,13 @@
-<template>
-  <div>
-    <ul class="thumbnails">
-      <li v-for="(time, index) in timestamps" :key='index'
-        class="thumbnail"
-        :style="{
-          'background': `url(${tiledImagePath}) 0 0`,
-          'background-position': `-${ 160 * (index % 10) }px -${ 90 * Math.floor(index / 10) }px`
-        }"
-        :data-time="time"
-        @click="onThumbnailClick"
-        ></li>
-    </ul>
-  </div>
+<template lang="pug">
+div
+  ul.thumbnails
+    li.thumbnail(v-for="(time, index) in timestamps" :key="index"
+      @click="onThumbnailClick"
+      :data-time="time"
+      :style={
+        'background': `url(${tiledImagePath}) 0 0`,
+        'background-position': `-${ 160 * (index % 10) }px -${ 90 * Math.floor(index / 10) }px`
+      })
 </template>
 
 <script>
@@ -56,19 +52,17 @@ export default {
 }
 </script>
 
-<style scoped>
-  ul {
-    list-style-type: none;
-    line-height: 0;
-    padding: 0;
-    margin: 0;
-  }
-  ul > li {
-    display: inline-block;
-  }
-  .thumbnail {
-    width: 160px;
-    height: 90px;
-    overflow: hidden;
-  }
+<style lang="stylus" scoped>
+ul
+  list-style-type none
+  line-height 0
+  padding 0
+  margin 0
+  & > li
+    display inline-block
+
+.thumbnail
+  width 160px
+  height 90px
+  overflow hidden
 </style>
