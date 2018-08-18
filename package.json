@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon --watch routes ./bin/www"
+    "dev": "./node_modules/nodemon/bin/nodemon.js --watch routes ./bin/www & webpack --watch",
+    "start": "node ./bin/www"
   },
   "dependencies": {
     "config": "^2.0.1",
@@ -18,5 +19,21 @@
     "pug": "2.0.0-beta11",
     "stylus": "0.54.5"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@babel/core": "^7.0.0-rc.1",
+    "@babel/preset-env": "^7.0.0-rc.1",
+    "babel-loader": "^8.0.0-beta",
+    "css-loader": "^1.0.0",
+    "eslint": "^5.4.0",
+    "eslint-loader": "^2.1.0",
+    "eslint-plugin-vue": "^4.7.1",
+    "nodemon": "^1.18.3",
+    "vue": "^2.5.17",
+    "vue-loader": "^15.3.0",
+    "vue-router": "^3.0.1",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0",
+    "webpack-livereload-plugin": "^2.1.1"
+  }
 }

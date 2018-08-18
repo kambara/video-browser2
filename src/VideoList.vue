@@ -28,7 +28,9 @@
 </template>
 
 <script>
-module.exports = {
+import VideoUtil from './VideoUtil'
+
+export default {
   data: function() {
     return {
       relativePath: null,
@@ -42,7 +44,7 @@ module.exports = {
     this.relativePath = (this.$route.params[0] || '')
   },
   watch: {
-    '$route': function(to, from) {
+    '$route': function() {
       this.relativePath = (this.$route.params[0] || '')
     },
     relativePath: async function() {

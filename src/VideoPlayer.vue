@@ -58,7 +58,9 @@
 </template>
 
 <script>
-module.exports = {
+import store from './store'
+
+export default {
   props: {
     path: String
   },
@@ -79,7 +81,7 @@ module.exports = {
       volume: 0.5,
       width: 0,
       height: 0,
-      sharedState: window.store.state
+      sharedState: store.state
     }
   },
   created: async function() {
@@ -154,10 +156,10 @@ module.exports = {
       }
       this.loaded = true
     },
-    onVideoEnded: function(event) {
+    onVideoEnded: function() {
       this.pause()
     },
-    onVideoMouseMove: function(event) {
+    onVideoMouseMove: function() {
       this.isControlVisible = true
       if (this.hideControlTimeoutId != null) {
         clearTimeout(this.hideControlTimeoutId)
@@ -166,10 +168,10 @@ module.exports = {
         this.hideControlLater()
       }
     },
-    hideControlLater: function(event) {
+    hideControlLater: function() {
       this.hideControlTimeoutId = setTimeout(this.hideControl, 4*1000)
     },
-    hideControl: function(event) {
+    hideControl: function() {
       this.isControlVisible = false
     },
     //
@@ -193,7 +195,7 @@ module.exports = {
     //
     // Play Button
     //
-    onPlayButtonClick: function(event) {
+    onPlayButtonClick: function() {
       if (this.paused) {
         this.play()
       } else {

@@ -1,5 +1,9 @@
-const VideoList = httpVueLoader('/javascripts/VideoList.vue')
-const Video = httpVueLoader('/javascripts/Video.vue')
+import Vue from 'vue'
+import VueRouter from 'vue-router'
+import VideoList from './VideoList'
+import Video from './Video'
+
+Vue.use(VueRouter)
 
 const router = new VueRouter({
   mode: 'history',

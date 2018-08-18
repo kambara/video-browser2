@@ -10,22 +10,26 @@
 </template>
 
 <script>
-module.exports = {
+import VideoPlayer from './VideoPlayer'
+import ThumbnailsList from './ThumbnailsList'
+import VideoUtil from './VideoUtil'
+
+export default {
   data: function () {
     return {
       path: this.$route.params[0] || ''
     }
   },
   components: {
-    VideoPlayer: httpVueLoader('/javascripts/VideoPlayer.vue'),
-    ThumbnailsList: httpVueLoader('/javascripts/ThumbnailsList.vue')
+    VideoPlayer: VideoPlayer,
+    ThumbnailsList: ThumbnailsList
   },
   created: function() {
     
   },
   mixins: [VideoUtil],
   methods: {
-    onGenerateThumbnailsButtonClick: async function(event) {
+    onGenerateThumbnailsButtonClick: async function() {
       console.log('gen thumb')
       const response = await fetch(`/api/generate-thumbnails/${this.path}`)
       const json = await response.json()
