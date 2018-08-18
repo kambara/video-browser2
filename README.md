@@ -9,7 +9,6 @@
 
 ### Install
 
-    npm install -g nodemon
     yarn install
 
 ## Config
@@ -21,7 +20,7 @@
 
 ### Dev mode
 
-    DEBUG=video-browser2:* npm run dev
+    DEBUG=video-browser2:* yarn run dev
 
 In order to enable livereload, install browser extension
 
@@ -37,7 +36,6 @@ TBD
 優先度高
 
 - Webpack
-    - LiveReload
     - Lint
 - pug
 - 一覧のサムネイル表示
