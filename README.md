@@ -22,10 +22,14 @@
 
     DEBUG=video-browser2:* yarn run dev
 
-In order to enable livereload, install browser extension
+In order to enable livereload, install browser extension:
 
 - [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
 - [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remotelivereload/)
+
+Just webpack:
+
+    yarn run webpack
 
 ### Production mode
 
@@ -35,8 +39,6 @@ TBD
 
 優先度高
 
-- Webpack
-    - Lint
 - pug
 - 一覧のサムネイル表示
 - 動画領域をより大きくする

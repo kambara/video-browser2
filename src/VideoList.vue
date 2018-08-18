@@ -44,7 +44,7 @@ export default {
     this.relativePath = (this.$route.params[0] || '')
   },
   watch: {
-    '$route': function(to, from) {
+    '$route': function() {
       this.relativePath = (this.$route.params[0] || '')
     },
     relativePath: async function() {

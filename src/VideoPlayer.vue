@@ -156,10 +156,10 @@ export default {
       }
       this.loaded = true
     },
-    onVideoEnded: function(event) {
+    onVideoEnded: function() {
       this.pause()
     },
-    onVideoMouseMove: function(event) {
+    onVideoMouseMove: function() {
       this.isControlVisible = true
       if (this.hideControlTimeoutId != null) {
         clearTimeout(this.hideControlTimeoutId)
@@ -168,10 +168,10 @@ export default {
         this.hideControlLater()
       }
     },
-    hideControlLater: function(event) {
+    hideControlLater: function() {
       this.hideControlTimeoutId = setTimeout(this.hideControl, 4*1000)
     },
-    hideControl: function(event) {
+    hideControl: function() {
       this.isControlVisible = false
     },
     //
@@ -195,7 +195,7 @@ export default {
     //
     // Play Button
     //
-    onPlayButtonClick: function(event) {
+    onPlayButtonClick: function() {
       if (this.paused) {
         this.play()
       } else {

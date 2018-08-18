@@ -29,7 +29,7 @@ export default {
   },
   mixins: [VideoUtil],
   methods: {
-    onGenerateThumbnailsButtonClick: async function(event) {
+    onGenerateThumbnailsButtonClick: async function() {
       console.log('gen thumb')
       const response = await fetch(`/api/generate-thumbnails/${this.path}`)
       const json = await response.json()
