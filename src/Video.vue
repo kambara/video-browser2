@@ -1,12 +1,10 @@
-<template>
-  <div>
-    <video-player :path="path"></video-player>
-    <h2>{{ basename(path) }}</h2>
-    <button @click="onGenerateThumbnailsButtonClick">
-      Generate Thumbnails
-    </button>
-    <thumbnails-list :path="path"></thumbnails-list>
-  </div>
+<template lang="pug">
+div
+  video-player(:path='path')
+  h2 {{ basename(path) }}
+  button(@click='onGenerateThumbnailsButtonClick')
+    | Generate Thumbnails
+  thumbnails-list(:path='path')
 </template>
 
 <script>
@@ -39,11 +37,10 @@ export default {
 }
 </script>
 
-<style scoped>
-  h2 {
-    padding: 0;
-    margin: 16px;
-    font-size: 18px;
-    font-weight: normal;
-  }
+<style lang="stylus" scoped>
+h2
+  padding 0
+  margin 16px
+  font-size 18px
+  font-weight normal
 </style>

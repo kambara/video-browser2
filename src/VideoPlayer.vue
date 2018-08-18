@@ -1,60 +1,41 @@
-<template>
-  <div class="video-container"
-    @mousemove="onVideoMouseMove"
-    :style="{ width: width+'px', height: height+'px' }"
-    >
-    <video
-      type="video/mp4"
-      :src="src"
-      :autoplay="isAutoPlay"
-      :width="width"
-      :height="height"
-      @canplay="onVideoCanPlay"
-      @playing="updatePaused"
-      @pause="updatePaused"
-      @ended="onVideoEnded"
-      >
-    </video>
-    <transition name="fade">
-      <div class="controls" v-if="isControlVisible">
-        <input
-          type="range"
-          class="seek-bar"
-          :value="currentTimeSec"
-          :max="duration"
-          @input="onSeekBarInput"
-          @change="onSeekBarChange"
-          />
-        <div>
-          <button class="fullscreen-button" @click="toggleFullscreen">
-            <i class="fas fa-lg" :class="fullscreenButtonClass"></i>
-          </button>
-          <button
-            class="play-button"
-            :disabled="!loaded"
-            @click="onPlayButtonClick"
-            >
-            <i class="fas fa-lg" :class="playButtonClass"></i>
-          </button>
-          <input
-            type="range"
-            class="volume"
-            max=1
-            step="0.01"
-            :value="volume"
-            @input="onVolumeInput"
-            />
-          <span class="time">
-            {{ currentTimeSec }}
-            /
-            {{ duration }}
-
-            {{ sharedState.message }}
-          </span>
-        </div>
-      </div>
-    </transition>
-  </div>
+<template lang="pug">
+.video-container(
+  @mousemove='onVideoMouseMove'
+  :style="{ width: width+'px', height: height+'px' }")
+  video(
+    type='video/mp4'
+    :src='src'
+    :autoplay='isAutoPlay'
+    :width='width'
+    :height='height'
+    @canplay='onVideoCanPlay'
+    @playing='updatePaused'
+    @pause='updatePaused'
+    @ended='onVideoEnded')
+  transition(name='fade')
+    .controls(v-if='isControlVisible')
+      input.seek-bar(
+        type='range'
+        :value='currentTimeSec'
+        :max='duration'
+        @input='onSeekBarInput'
+        @change='onSeekBarChange')
+      div
+        button.fullscreen-button(@click='toggleFullscreen')
+          i.fas.fa-lg(:class='fullscreenButtonClass')
+        button.play-button(:disabled='!loaded' @click='onPlayButtonClick')
+          i.fas.fa-lg(:class='playButtonClass')
+        input.volume(
+          type='range'
+          max='1'
+          step='0.01'
+          :value='volume'
+          @input='onVolumeInput')
+        span.time
+          | {{ currentTimeSec }}
+          | /
+          | {{ duration }}
+          | {{ sharedState.message }}
 </template>
 
 <script>
@@ -239,75 +220,71 @@ export default {
 }
 </script>
 
-<style scoped>
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity .5s;
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
-  }
-  .video-container {
-    position: relative;
-  }
-  video {
-    background-color: black;
-  }
-  .controls {
-    position: absolute;
-    bottom: 0px;
-    width: 100%;
-    padding: 16px 16px;
-    box-sizing: border-box;
-    background-color: rgba(0, 0, 0, 0.3);
-  }
-  input[type="range"] {
-    -webkit-appearance: none;
-    height: 5px;
-    box-sizing: border-box;
-    margin: 8px 0;
-    border-radius: 3px;
-    background-color: rgba(255, 255, 255, 0.3);
-    outline: 0;
-    cursor: pointer;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    position: relative;
-    display: block;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background-color: white;
-    cursor: pointer;
-  }
-  input[type="range"].seek-bar {
-    display: block;
-    width: 100%;
-    margin-bottom: 16px;
-  }
-  button {
-    width: 36px;
-    height: 36px;
-    background-color: rgba(0, 0, 0, 0);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    outline: 0;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: rgba(0, 0, 0, 0.5);
-  }
-  button.play-button {
-    width: 56px;
-  }
-  button.fullscreen-button {
-    float: right;
-  }
-  input[type="range"].volume {
-    display: inline-block;
-    width: 100px;
-    margin: 8px 10px;
-    vertical-align: middle;
-  }
+<style lang="stylus" scoped>
+.fade-enter-active, .fade-leave-active
+  transition opacity .5s
+
+.fade-enter, .fade-leave-to
+  opacity 0
+
+.video-container
+  position relative
+
+  video
+    background-color black
+
+  .controls
+    position absolute
+    bottom 0px
+    width 100%
+    padding 16px 16px
+    box-sizing border-box
+    background-color rgba(0, 0, 0, 0.3)
+
+    input[type="range"]
+      -webkit-appearance none
+      height 5px
+      box-sizing border-box
+      margin 8px 0
+      border-radius 3px
+      background-color rgba(255, 255, 255, 0.3)
+      outline 0
+      cursor pointer
+
+      &::-webkit-slider-thumb
+        -webkit-appearance none
+        position relative
+        display block
+        width 14px
+        height 14px
+        border-radius 50%
+        background-color white
+        cursor pointer
+
+      &.seek-bar
+        display block
+        width 100%
+        margin-bottom 16px
+
+      &.volume
+        display inline-block
+        width 100px
+        margin 8px 10px
+        vertical-align middle
+
+    button
+      width 36px
+      height 36px
+      background-color rgba(0, 0, 0, 0)
+      color white
+      border none
+      border-radius 6px
+      outline 0
+      cursor pointer
+      &:hover
+        background-color rgba(0, 0, 0, 0.5)
+      &.play-button
+        width 56px
+      &.fullscreen-button
+        float right
 </style>
