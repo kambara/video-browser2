@@ -1,11 +1,11 @@
 <template lang="pug">
 div
   nav
-    div(v-if='parentDir != null')
-      router-link.back-button(:to='linkToList(parentDir)')
+    div(v-if="parent(path) != null")
+      router-link.back-button(:to="linkToParentList(path)")
         i.fas.fa-arrow-left
       h2
-        | {{ basename(relativePath) }}
+        | {{ basename(path) }}
   ul
     li(v-for='(entry, index) in entries', :key='index')
       div(v-if="entry.type == 'directory'")
@@ -20,47 +20,27 @@ div
 import VideoUtil from './VideoUtil'
 
 export default {
-  data: function() {
+  mixins: [VideoUtil],
+  props: ['path'],
+  data () {
     return {
-      relativePath: null,
-      entries: [
-        // type: ''
-        // path: ''
-      ]
+      entries: []
     }
-  },
-  created: function() {
-    this.relativePath = (this.$route.params[0] || '')
   },
   watch: {
-    '$route': function() {
-      this.relativePath = (this.$route.params[0] || '')
-    },
-    relativePath: async function() {
-      const response = await fetch(`/api/list/${this.relativePath}`)
+    path () {
+      this.updateEntries()
+    }
+  },
+  created: async function() {
+    this.updateEntries()
+  },
+  methods: {
+    async updateEntries () {
+      const response = await fetch(`/api/list/${this.path}`)
       this.entries = await response.json()
     }
-  },
-  computed: {
-    parentDir: function() {
-      const path = this.relativePath.replace(/\/$/, '')
-      if (path.length === 0) {
-        return null
-      }
-      const elements = path.split('/')
-      elements.pop()
-      return elements.join('/')
-    }
-  },
-  mixins: [VideoUtil],
-  methods: {
-    linkToList: function(path) {
-      return `/list/${path}`
-    },
-    linkToVideo: function(path) {
-      return `/video/${path}`
-    },
-  },
+  }
 }
 </script>
 
@@ -69,21 +49,21 @@ nav
   margin 16px
   font-size 20px
 
-.back-button
-  display inline-block
-  width 32px
-  height 32px
-  line-height 32px
-  text-align center
-  margin-right 8px
+  .back-button
+    display inline-block
+    width 32px
+    height 32px
+    line-height 32px
+    text-align center
+    margin-right 8px
 
-h2
-  display inline-block
-  margin 0px
-  padding 0px
-  height 32px
-  line-height 32px
-  font-size 20px
+  h2
+    display inline-block
+    margin 0px
+    padding 0px
+    height 32px
+    line-height 32px
+    font-size 20px
 
 li
   font-size 16px

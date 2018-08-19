@@ -1,8 +1,12 @@
 <template lang="pug">
-div
+div(@mousemove="onMouseMove")
+  transition(name="fade")
+    nav(v-if="isNavigationVisible")
+      router-link.back-button(:to="linkToParentList(path)")
+        i.fas.fa-arrow-left
   video-player
   h2 {{ basename(path) }}
-  button(@click='onGenerateThumbnailsButtonClick')
+  button(@click="onGenerateThumbnailsButtonClick")
     | Generate Thumbnails
   scene-list
 </template>
@@ -17,30 +21,71 @@ import VideoUtil from './VideoUtil'
 Vue.use(Vuex)
 
 export default {
-  data: function () {
+  mixins: [VideoUtil],
+  props: ['path'],
+  data () {
     return {
-      path: this.$route.params[0] || ''
+      isNavigationVisible: true,
+      hideNavigationTimeoutId: null,
     }
   },
-  components: {
-    VideoPlayer: VideoPlayer,
-    SceneList: SceneList
-  },
-  created: function() {
+  created () {
     this.$store.dispatch('initVideo', this.path)
+    this.hideNavigationLater()
   },
-  mixins: [VideoUtil],
   methods: {
-    onGenerateThumbnailsButtonClick: async function() {
+    async onGenerateThumbnailsButtonClick () {
       const response = await fetch(`/api/generate-thumbnails/${this.path}`)
       const json = await response.json()
       console.log(json)
-    }
-  }
+    },
+    onMouseMove () {
+      this.showNavigation()
+      this.hideNavigationLater()
+    },
+    showNavigation () {
+      if (this.hideNavigationTimeoutId != null) {
+        clearTimeout(this.hideNavigationTimeoutId)
+      }
+      this.isNavigationVisible = true
+    },
+    hideNavigationLater () {
+      this.hideNavigationTimeoutId = setTimeout(() => {
+        this.isNavigationVisible = false
+      }, 4 * 1000)
+    },
+  },
+  components: {
+    VideoPlayer,
+    SceneList,
+  },
 }
 </script>
 
 <style lang="stylus" scoped>
+.fade-enter-active, .fade-leave-active
+  transition opacity .5s
+
+.fade-enter, .fade-leave-to
+  opacity 0
+
+nav
+  position fixed
+  z-index 2
+  padding 16px
+  font-size 20px
+
+  .back-button
+    display inline-block
+    width 32px
+    height 32px
+    line-height 32px
+    text-align center
+    border-radius 6px
+
+    &:hover
+      background-color rgba(0, 0, 0, 0.5)
+
 h2
   padding 0
   margin 16px

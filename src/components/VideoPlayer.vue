@@ -45,7 +45,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default {
-  data: function () {
+  data () {
     return {
       isAutoPlay: true,
       loaded: false,
@@ -62,32 +62,17 @@ export default {
       height: 0,
     }
   },
-  created: async function() {
-    setInterval(() => this.updateTime(), 100)
-  },
-  mounted: function() {
-    this.onWindowResize()
-    window.addEventListener('resize', this.onWindowResize)
-  },
-  beforeDestroy: function() {
-    this.pause()
-    if (this.videoElement) {
-      this.videoElement.removeAttribute('src')
-      this.videoElement.load()
-    }
-    window.removeEventListener('resize', this.onWindowResize)
-  },
   computed: {
-    currentTimeSec: function() {
+    currentTimeSec () {
       return Math.floor(this.currentTime / 1000)
     },
-    playButtonClass: function() {
+    playButtonClass () {
       return {
         'fa-play': this.paused,
         'fa-pause': !this.paused
       }
     },
-    fullscreenButtonClass: function() {
+    fullscreenButtonClass () {
       return {
         'fa-expand': !this.isFullscreen,
         'fa-compress': this.isFullscreen
@@ -95,46 +80,62 @@ export default {
     },
   },
   watch: {
-    '$store.state.videoStartTime': function() {
+    '$store.state.videoStartTime' () {
       this.currentTime = this.$store.state.videoStartTime
     }
   },
+  created: async function() {
+    setInterval(() => this.updateTime(), 100)
+    this.hideControlLater()
+  },
+  mounted () {
+    this.onWindowResize()
+    window.addEventListener('resize', this.onWindowResize)
+  },
+  beforeDestroy () {
+    this.pause()
+    if (this.videoElement) {
+      this.videoElement.removeAttribute('src')
+      this.videoElement.load()
+    }
+    window.removeEventListener('resize', this.onWindowResize)
+  },
   methods: {
-    play: function() {
+    play () {
       if (this.videoElement) {
         this.videoElement.play()
       }
     },
-    pause: function() {
+    pause () {
       if (this.videoElement) {
         this.videoElement.pause()
       }
     },
-    updateTime: function() {
+    updateTime () {
       if (this.videoElement && !this.videoElement.paused) {
         this.currentTime += Date.now() - this.lastTime
       }
       this.lastTime = Date.now()
     },
-    updatePaused: function(event) {
+    updatePaused (event) {
       this.paused = event.target.paused
     },
     //
     // Video Event
     //
-    onVideoLoadStart: function() {
+    onVideoLoadStart () {
       this.loaded = false
     },
-    onVideoCanPlay: function(event) {
+    onVideoCanPlay (event) {
       if (!this.videoElement) {
         this.videoElement = event.target
       }
       this.loaded = true
     },
-    onVideoEnded: function() {
+    onVideoEnded () {
       this.pause()
     },
-    onVideoMouseMove: function() {
+    onVideoMouseMove () {
       this.isControlVisible = true
       if (this.hideControlTimeoutId != null) {
         clearTimeout(this.hideControlTimeoutId)
@@ -143,16 +144,15 @@ export default {
         this.hideControlLater()
       }
     },
-    hideControlLater: function() {
-      this.hideControlTimeoutId = setTimeout(this.hideControl, 4*1000)
-    },
-    hideControl: function() {
-      this.isControlVisible = false
+    hideControlLater () {
+      this.hideControlTimeoutId = setTimeout(() => {
+        this.isControlVisible = false
+      }, 4 * 1000)
     },
     //
     // Seek Bar
     //
-    onSeekBarInput: function(event) {
+    onSeekBarInput (event) {
       if (!this.seeking) {
         this.seeking = true
         if (this.loaded) {
@@ -162,7 +162,7 @@ export default {
       }
       this.currentTime = event.target.value * 1000
     },
-    onSeekBarChange: function(event) {
+    onSeekBarChange (event) {
       this.currentTime = event.target.value * 1000
       this.$store.dispatch('startVideoAt', this.currentTime)
       this.seeking = false
@@ -170,7 +170,7 @@ export default {
     //
     // Play Button
     //
-    onPlayButtonClick: function() {
+    onPlayButtonClick () {
       if (this.paused) {
         this.play()
       } else {
@@ -180,7 +180,7 @@ export default {
     //
     // Volume
     //
-    onVolumeInput: function(event) {
+    onVolumeInput (event) {
       if (this.videoElement) {
         this.volume = event.target.value
         this.videoElement.volume = this.volume
@@ -189,7 +189,7 @@ export default {
     //
     // Fullscreen
     //
-    toggleFullscreen: function() {
+    toggleFullscreen () {
       if (document.webkitFullscreenElement) {
         document.webkitExitFullscreen()
         this.isFullscreen = false
@@ -202,14 +202,9 @@ export default {
     //
     // Window Resize
     //
-    onWindowResize: function() {
+    onWindowResize () {
       this.width = window.innerWidth
       this.height = window.innerHeight
-      // let height = Math.round(this.width * 9/16)
-      // if (height > window.innerHeight) {
-      //   height = window.innerHeight
-      // }
-      // this.height = height
     }
   }
 }
@@ -276,12 +271,16 @@ export default {
       border-radius 6px
       outline 0
       cursor pointer
+
       &:hover
         background-color rgba(0, 0, 0, 0.5)
+
       &[disabled]
         opacity 0.4
+
       &.play-button
         width 56px
+        
       &.fullscreen-button
         float right
 </style>

@@ -13,15 +13,18 @@ const router = new VueRouter({
   routes: [
     {
       path: '/',
-      component: VideoList
+      component: VideoList,
+      props: { path: '' }
     },
     {
       path: '/list/*',
-      component: VideoList
+      component: VideoList,
+      props: route => ({ path: route.params[0] })
     },
     {
       path: '/video/*',
-      component: Video
+      component: Video,
+      props: route => ({ path: route.params[0] })
     }
   ]
 })

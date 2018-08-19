@@ -22,12 +22,9 @@
 
     DEBUG=video-browser2:* yarn run dev
 
-In order to enable livereload, install browser extension:
+In order to enable livereload, install browser extension for [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remotelivereload/)
 
-- [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)
-- [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remotelivereload/)
-
-Just webpack:
+#### Just webpack
 
     yarn run webpack
 
@@ -43,6 +40,7 @@ TBD
 - 一覧のサムネイル表示
 - サムネイルリストから再生
 - 時間表示
+- キー操作
 
 優先度中
 

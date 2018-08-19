@@ -1,17 +1,28 @@
 <script>
 export default {
   methods: {
-    basename: function(path) {
+    basename (path) {
+      path = path.trim().replace(/\/$/, '')
+      return path.split('/').pop()
+    },
+    parent (path) {
+      path = path.trim().replace(/\/$/, '')
+      if (path.length === 0) {
+        return null
+      }
       const elements = path.split('/')
-      if (elements.length === 1) {
-        return elements[0]
-      }
-      const fileName = elements.pop()
-      if (fileName.length > 0) {
-        return fileName
-      }
-      return elements.pop()
-    }
+      elements.pop()
+      return elements.join('/')
+    },
+    linkToParentList (path) {
+      return this.linkToList(this.parent(path))
+    },
+    linkToList (path) {
+      return `/list/${path}`
+    },
+    linkToVideo (path) {
+      return `/video/${path}`
+    },
   }
 }
 </script>

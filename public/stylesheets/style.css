@@ -7,6 +7,9 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, "Yu Gothic Medium", YuGothic, sans-serif;
 }
 a {
-  color: #00b7ff;
+  color: #fff;
   text-decoration: none;
+}
+a:hover {
+  color: #34c6ff;
 }
