@@ -4,7 +4,7 @@ const LiveReloadPlugin = require('webpack-livereload-plugin')
 
 module.exports = {
   mode: 'development',
-  entry: './src/main.js',
+  entry: './client/main.js',
   output: {
     path: path.join(__dirname, 'public/javascripts/'),
     publicPath: '/javascripts/',

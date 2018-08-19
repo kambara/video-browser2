@@ -30,17 +30,16 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 ### Production mode
 
-TBD
+    yarn start
 
 ## TODO
 
 優先度高
 
-- Videoから戻るボタン
-- 一覧のサムネイル表示
-- サムネイルリストから再生
+- シーンリストから再生
 - 時間表示
 - キー操作
+- 一括サムネイル生成
 
 優先度中
 

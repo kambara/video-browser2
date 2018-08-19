@@ -37,7 +37,8 @@ export default {
 ul
   list-style-type none
   padding 0
-  margin 0
+  margin 16px
+
   & > li
     display inline-block
     width 160px
