@@ -1,6 +1,6 @@
 const express = require('express')
-const router = express.Router()
 const config = require('config')
+const router = express.Router()
 
 router.get('/*', function(req, res) {
   res.render('index', { title: config.title })
