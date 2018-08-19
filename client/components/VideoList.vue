@@ -19,6 +19,7 @@ div
       div(v-if="entry.type == 'file'")
         router-link(:to="linkToVideo(entry.path)")
           .title
+            i.fas.fa-play-circle
             | {{ basename(entry.path) }}
           .scenes(v-if="entry.thumbnailsCount > 0")
             img(v-for="(path, index) in representativeScenes(entry)"
@@ -104,7 +105,7 @@ ul
         letter-spacing 0.03em
 
         i
-          margin-right 4px
+          margin-right 6px
 
       .scenes
         height 90px
