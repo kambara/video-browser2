@@ -204,11 +204,12 @@ export default {
     //
     onWindowResize: function() {
       this.width = window.innerWidth
-      let height = Math.round(this.width * 9/16)
-      if (height > window.innerHeight) {
-        height = window.innerHeight
-      }
-      this.height = height
+      this.height = window.innerHeight
+      // let height = Math.round(this.width * 9/16)
+      // if (height > window.innerHeight) {
+      //   height = window.innerHeight
+      // }
+      // this.height = height
     }
   }
 }
