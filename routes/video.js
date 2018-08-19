@@ -22,29 +22,6 @@ module.exports = class Video {
     return path.basename(this.relativePath)
   }
 
-  getAllScenesImageRelativePath() {
-    return path.join('/thumbnails', this.md5() + '.jpg')
-  }
-  
-  getAllScenesImagePath() {
-    return path.join(
-      __dirname,
-      '../data/public',
-      this.getAllScenesImageRelativePath())
-  }
-
-  existAllScenesImage() {
-    return fs.existsSync(this.getAllScenesImagePath())
-  }
-
-  getThumbnailsDirPath() {
-    return path.join(__dirname, '../data/public/thumbnails', this.md5())
-  }
-
-  getThumbnailImagePath(time) {
-    return path.join(this.getThumbnailsDirPath(), time + '.jpg')
-  }
-
   md5() {
     const hash = crypto.createHash('md5')
     hash.update(this.relativePath)
@@ -57,6 +34,55 @@ module.exports = class Video {
     })
   }
 
+  //
+  // AllScenesImage
+  //
+  getAllScenesImagePublicPath() {
+    return path.join('/thumbnails', this.getAllScenesImageFileName())
+  }
+  
+  getAllScenesImagePath() {
+    return path.join(
+      __dirname,
+      '../data/public/thumbnails',
+      this.getAllScenesImageFileName())
+  }
+
+  getAllScenesImageFileName() {
+    return this.md5() + '.jpg'
+  }
+
+  existAllScenesImage() {
+    return fs.existsSync(this.getAllScenesImagePath())
+  }
+
+  //
+  // Thumbnail Images
+  //
+  getThumbnailsDirPublicPath() {
+    return path.join('/thumbnails', this.md5())
+  }
+
+  getThumbnailsDirPath() {
+    return path.join(__dirname, '../data/public/thumbnails', this.md5())
+  }
+
+  getThumbnailImagePath(time) {
+    return path.join(this.getThumbnailsDirPath(), time + '.jpg')
+  }
+
+  getThumbnailsCount() {
+    if (!fs.existsSync(this.getThumbnailsDirPath())) {
+      return 0
+    }
+    return fs.readdirSync(this.getThumbnailsDirPath())
+      .filter(entry => !!entry.match(/\.jpg$/))
+      .length
+  }
+
+  //
+  // Generate Thumbnails
+  //
   generateThumbnails() {
     this.getMetadata((err, metadata) => {
       mkpath.sync(this.getThumbnailsDirPath())
@@ -110,6 +136,9 @@ module.exports = class Video {
       .save(this.getThumbnailImagePath(time))
   }
 
+  //
+  // Generate AllScenesImage
+  //
   generateAllScenesImage(duration, interval) {
     console.log('Generate base image')
     duration = Math.floor(duration)

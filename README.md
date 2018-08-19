@@ -36,7 +36,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- 一覧のサムネイル表示
 - シーンリストから再生
 - 時間表示
 - キー操作

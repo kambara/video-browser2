@@ -1,30 +1,13 @@
 const express = require('express')
 const router = express.Router()
-const fs = require('fs')
-const path = require('path')
 const ffmpeg = require('fluent-ffmpeg')
-const config = require('config')
 const Video = require('./video')
+const VideoDir = require('./video-dir')
 
-router.get('/list/*', function(req, res) {  
-  const relativeDirPath = req.params[0]
-  const dirPath = path.join(config.videoRoot, relativeDirPath)
-  fs.readdir(dirPath, (err, entries) => {
-    entries = entries
-      .filter(entry => {
-        if (path.basename(entry).match(/^\./)) return false
-        return true
-      })
-      .map(entry => {
-        const entryPath = path.join(dirPath, entry)
-        const stat = fs.statSync(entryPath)
-        const type = stat.isDirectory() ? 'directory' : 'file'
-        return {
-          type: type,
-          path: path.join(relativeDirPath, entry)
-        }
-      })
-    res.json(entries)
+router.get('/list/*', function(req, res) {
+  const videoDir = new VideoDir(req.params[0])
+  videoDir.getEntriesJson((err, json) => {
+    res.json(json)
   })
 })
 
@@ -33,7 +16,7 @@ router.get('/video-info/*', function(req, res) {
   video.getMetadata((err, metadata) => {
     res.json({
       duration: metadata.format.duration,
-      allScenesImagePath: video.getAllScenesImageRelativePath(),
+      allScenesImagePath: video.getAllScenesImagePublicPath(),
       interval: 10
     })
   })
@@ -71,7 +54,5 @@ router.get('/generate-thumbnails/*', function(req, res) {
   video.generateThumbnails()
   res.json({})
 })
-
-
 
 module.exports = router

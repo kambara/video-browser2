@@ -72,13 +72,14 @@ export default {
 nav
   position fixed
   z-index 2
-  padding 16px
+  padding 16px 0
   font-size 20px
 
   .back-button
     display inline-block
     width 32px
     height 32px
+    margin-left 8px
     line-height 32px
     text-align center
     border-radius 6px

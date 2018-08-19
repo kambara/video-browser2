@@ -1,4 +1,5 @@
 {
   "videoRoot": "/path/to/video/folder",
-  "title": "VIDEO BROWSER"
+  "title": "VIDEO BROWSER",
+  "sceneInterval": 10
 }
