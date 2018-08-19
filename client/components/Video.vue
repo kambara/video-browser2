@@ -16,12 +16,12 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VideoPlayer from './VideoPlayer'
 import SceneList from './SceneList'
-import VideoUtil from '../mixins/VideoUtil'
+import VideoPath from '../mixins/VideoPath'
 
 Vue.use(Vuex)
 
 export default {
-  mixins: [VideoUtil],
+  mixins: [VideoPath],
   props: ['path'],
   data () {
     return {

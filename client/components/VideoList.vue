@@ -26,10 +26,10 @@ div
 </template>
 
 <script>
-import VideoUtil from '../mixins/VideoUtil'
+import VideoPath from '../mixins/VideoPath'
 
 export default {
-  mixins: [VideoUtil],
+  mixins: [VideoPath],
   props: ['path'],
   data () {
     return {

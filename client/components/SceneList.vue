@@ -7,16 +7,18 @@ div
       :data-time="time"
       :style="thumbnailStyle(index)"
       @click="onThumbnailClick"
-      ) {{ time }}
+      ) {{ formatTime(time) }}
 </template>
 
 <script>
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VideoUtil from '../mixins/VideoUtil'
 
 Vue.use(Vuex)
 
 export default {
+  mixins: [VideoUtil],
   methods: {
     thumbnailStyle: function(index) {
       const x = 160 * (index % 10)

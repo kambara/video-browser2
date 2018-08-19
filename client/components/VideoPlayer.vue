@@ -33,18 +33,20 @@
           :value='volume'
           @input='onVolumeInput')
         span.time
-          | {{ currentTimeSec }}
+          | {{ formatTime(currentTimeSec) }}
           | /
-          | {{ $store.state.duration }}
+          | {{ formatTime($store.state.duration) }}
 </template>
 
 <script>
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VideoUtil from '../mixins/VideoUtil'
 
 Vue.use(Vuex)
 
 export default {
+  mixins: [VideoUtil],
   data () {
     return {
       isAutoPlay: true,
@@ -101,32 +103,32 @@ export default {
     window.removeEventListener('resize', this.onWindowResize)
   },
   methods: {
-    play () {
+    play() {
       if (this.videoElement) {
         this.videoElement.play()
       }
     },
-    pause () {
+    pause() {
       if (this.videoElement) {
         this.videoElement.pause()
       }
     },
-    updateTime () {
+    updateTime() {
       if (this.videoElement && !this.videoElement.paused) {
         this.currentTime += Date.now() - this.lastTime
       }
       this.lastTime = Date.now()
     },
-    updatePaused (event) {
+    updatePaused(event) {
       this.paused = event.target.paused
     },
     //
     // Video Event
     //
-    onVideoLoadStart () {
+    onVideoLoadStart() {
       this.loaded = false
     },
-    onVideoCanPlay (event) {
+    onVideoCanPlay(event) {
       if (!this.videoElement) {
         this.videoElement = event.target
       }
@@ -150,7 +152,7 @@ export default {
       }, 4 * 1000)
     },
     //
-    // Seek Bar
+    // Seek Bar Event
     //
     onSeekBarInput (event) {
       if (!this.seeking) {
@@ -168,7 +170,7 @@ export default {
       this.seeking = false
     },
     //
-    // Play Button
+    // Play Button Event
     //
     onPlayButtonClick () {
       if (this.paused) {
@@ -178,7 +180,7 @@ export default {
       }
     },
     //
-    // Volume
+    // Volume Event
     //
     onVolumeInput (event) {
       if (this.videoElement) {
@@ -187,7 +189,7 @@ export default {
       }
     },
     //
-    // Fullscreen
+    // Fullscreen Event
     //
     toggleFullscreen () {
       if (document.webkitFullscreenElement) {
@@ -200,7 +202,7 @@ export default {
       }
     },
     //
-    // Window Resize
+    // Window Resize Event
     //
     onWindowResize () {
       this.width = window.innerWidth
