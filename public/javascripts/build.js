@@ -106,7 +106,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue_
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.esm.js\");\n/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ \"./node_modules/vuex/dist/vuex.esm.js\");\n/* harmony import */ var _VideoPlayer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./VideoPlayer */ \"./src/components/VideoPlayer.vue\");\n/* harmony import */ var _SceneList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SceneList */ \"./src/components/SceneList.vue\");\n/* harmony import */ var _VideoUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./VideoUtil */ \"./src/components/VideoUtil.vue\");\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n\n\n\n\n\nvue__WEBPACK_IMPORTED_MODULE_0__[\"default\"].use(vuex__WEBPACK_IMPORTED_MODULE_1__[\"default\"]);\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  mixins: [_VideoUtil__WEBPACK_IMPORTED_MODULE_4__[\"default\"]],\n  props: ['path'],\n\n  data() {\n    return {\n      isNavigationVisible: true,\n      hideNavigationTimeoutId: null\n    };\n  },\n\n  created() {\n    this.$store.dispatch('initVideo', this.path);\n    this.hideNavigationLater();\n  },\n\n  methods: {\n    async onGenerateThumbnailsButtonClick() {\n      const response = await fetch(`/api/generate-thumbnails/${this.path}`);\n      const json = await response.json();\n      console.log(json);\n    },\n\n    onMouseMove() {\n      this.showNavigation();\n      this.hideNavigationLater();\n    },\n\n    showNavigation() {\n      if (this.hideNavigationTimeoutId != null) {\n        clearTimeout(this.hideNavigationTimeoutId);\n      }\n\n      this.isNavigationVisible = true;\n    },\n\n    hideNavigationLater() {\n      this.hideNavigationTimeoutId = setTimeout(() => {\n        this.isNavigationVisible = false;\n      }, 4 * 1000);\n    }\n\n  },\n  components: {\n    VideoPlayer: _VideoPlayer__WEBPACK_IMPORTED_MODULE_2__[\"default\"],\n    SceneList: _SceneList__WEBPACK_IMPORTED_MODULE_3__[\"default\"]\n  }\n});\n\n//# sourceURL=webpack:///./src/components/Video.vue?./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.esm.js\");\n/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ \"./node_modules/vuex/dist/vuex.esm.js\");\n/* harmony import */ var _VideoPlayer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./VideoPlayer */ \"./src/components/VideoPlayer.vue\");\n/* harmony import */ var _SceneList__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SceneList */ \"./src/components/SceneList.vue\");\n/* harmony import */ var _mixins_VideoUtil__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../mixins/VideoUtil */ \"./src/mixins/VideoUtil.vue\");\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n\n\n\n\n\nvue__WEBPACK_IMPORTED_MODULE_0__[\"default\"].use(vuex__WEBPACK_IMPORTED_MODULE_1__[\"default\"]);\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  mixins: [_mixins_VideoUtil__WEBPACK_IMPORTED_MODULE_4__[\"default\"]],\n  props: ['path'],\n\n  data() {\n    return {\n      isNavigationVisible: true,\n      hideNavigationTimeoutId: null\n    };\n  },\n\n  created() {\n    this.$store.dispatch('initVideo', this.path);\n    this.hideNavigationLater();\n  },\n\n  methods: {\n    async onGenerateThumbnailsButtonClick() {\n      const response = await fetch(`/api/generate-thumbnails/${this.path}`);\n      const json = await response.json();\n      console.log(json);\n    },\n\n    onMouseMove() {\n      this.showNavigation();\n      this.hideNavigationLater();\n    },\n\n    showNavigation() {\n      if (this.hideNavigationTimeoutId != null) {\n        clearTimeout(this.hideNavigationTimeoutId);\n      }\n\n      this.isNavigationVisible = true;\n    },\n\n    hideNavigationLater() {\n      this.hideNavigationTimeoutId = setTimeout(() => {\n        this.isNavigationVisible = false;\n      }, 4 * 1000);\n    }\n\n  },\n  components: {\n    VideoPlayer: _VideoPlayer__WEBPACK_IMPORTED_MODULE_2__[\"default\"],\n    SceneList: _SceneList__WEBPACK_IMPORTED_MODULE_3__[\"default\"]\n  }\n});\n\n//# sourceURL=webpack:///./src/components/Video.vue?./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options");
 
 /***/ }),
 
@@ -118,7 +118,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue_
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _VideoUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./VideoUtil */ \"./src/components/VideoUtil.vue\");\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  mixins: [_VideoUtil__WEBPACK_IMPORTED_MODULE_0__[\"default\"]],\n  props: ['path'],\n\n  data() {\n    return {\n      entries: []\n    };\n  },\n\n  watch: {\n    path() {\n      this.updateEntries();\n    }\n\n  },\n  created: async function () {\n    this.updateEntries();\n  },\n  methods: {\n    async updateEntries() {\n      const response = await fetch(`/api/list/${this.path}`);\n      this.entries = await response.json();\n    }\n\n  }\n});\n\n//# sourceURL=webpack:///./src/components/VideoList.vue?./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _mixins_VideoUtil__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../mixins/VideoUtil */ \"./src/mixins/VideoUtil.vue\");\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n//\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  mixins: [_mixins_VideoUtil__WEBPACK_IMPORTED_MODULE_0__[\"default\"]],\n  props: ['path'],\n\n  data() {\n    return {\n      entries: []\n    };\n  },\n\n  watch: {\n    path() {\n      this.updateEntries();\n    }\n\n  },\n  created: async function () {\n    this.updateEntries();\n  },\n  methods: {\n    async updateEntries() {\n      const response = await fetch(`/api/list/${this.path}`);\n      this.entries = await response.json();\n    }\n\n  }\n});\n\n//# sourceURL=webpack:///./src/components/VideoList.vue?./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options");
 
 /***/ }),
 
@@ -134,15 +134,15 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue_
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./src/components/VideoUtil.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./src/components/VideoUtil.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./src/mixins/VideoUtil.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./src/mixins/VideoUtil.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  methods: {\n    basename(path) {\n      path = path.trim().replace(/\\/$/, '');\n      return path.split('/').pop();\n    },\n\n    parent(path) {\n      path = path.trim().replace(/\\/$/, '');\n\n      if (path.length === 0) {\n        return null;\n      }\n\n      const elements = path.split('/');\n      elements.pop();\n      return elements.join('/');\n    },\n\n    linkToParentList(path) {\n      return this.linkToList(this.parent(path));\n    },\n\n    linkToList(path) {\n      return `/list/${path}`;\n    },\n\n    linkToVideo(path) {\n      return `/video/${path}`;\n    }\n\n  }\n});\n\n//# sourceURL=webpack:///./src/components/VideoUtil.vue?./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n  methods: {\n    basename(path) {\n      path = path.trim().replace(/\\/$/, '');\n      return path.split('/').pop();\n    },\n\n    parent(path) {\n      path = path.trim().replace(/\\/$/, '');\n\n      if (path.length === 0) {\n        return null;\n      }\n\n      const elements = path.split('/');\n      elements.pop();\n      return elements.join('/');\n    },\n\n    linkToParentList(path) {\n      return this.linkToList(this.parent(path));\n    },\n\n    linkToList(path) {\n      return `/list/${path}`;\n    },\n\n    linkToVideo(path) {\n      return `/video/${path}`;\n    }\n\n  }\n});\n\n//# sourceURL=webpack:///./src/mixins/VideoUtil.vue?./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options");
 
 /***/ }),
 
@@ -601,30 +601,6 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _nod
 
 /***/ }),
 
-/***/ "./src/components/VideoUtil.vue":
-/*!**************************************!*\
-  !*** ./src/components/VideoUtil.vue ***!
-  \**************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./VideoUtil.vue?vue&type=script&lang=js& */ \"./src/components/VideoUtil.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ \"./node_modules/vue-loader/lib/runtime/componentNormalizer.js\");\nvar render, staticRenderFns\n\n\n\n\n/* normalize component */\n\nvar component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(\n  _VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n  render,\n  staticRenderFns,\n  false,\n  null,\n  null,\n  null\n  \n)\n\n/* hot reload */\nif (false) { var api; }\ncomponent.options.__file = \"src/components/VideoUtil.vue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);\n\n//# sourceURL=webpack:///./src/components/VideoUtil.vue?");
-
-/***/ }),
-
-/***/ "./src/components/VideoUtil.vue?vue&type=script&lang=js&":
-/*!***************************************************************!*\
-  !*** ./src/components/VideoUtil.vue?vue&type=script&lang=js& ***!
-  \***************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib!../../node_modules/vue-loader/lib??vue-loader-options!./VideoUtil.vue?vue&type=script&lang=js& */ \"./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./src/components/VideoUtil.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__[\"default\"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"]); \n\n//# sourceURL=webpack:///./src/components/VideoUtil.vue?");
-
-/***/ }),
-
 /***/ "./src/main.js":
 /*!*********************!*\
   !*** ./src/main.js ***!
@@ -634,6 +610,30 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _nod
 
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ \"./node_modules/vue/dist/vue.esm.js\");\n/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ \"./node_modules/vuex/dist/vuex.esm.js\");\n/* harmony import */ var vue_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-router */ \"./node_modules/vue-router/dist/vue-router.esm.js\");\n/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store */ \"./src/store.js\");\n/* harmony import */ var _components_VideoList__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/VideoList */ \"./src/components/VideoList.vue\");\n/* harmony import */ var _components_Video__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/Video */ \"./src/components/Video.vue\");\n\n\n\n\n\n\nvue__WEBPACK_IMPORTED_MODULE_0__[\"default\"].use(vuex__WEBPACK_IMPORTED_MODULE_1__[\"default\"]);\nvue__WEBPACK_IMPORTED_MODULE_0__[\"default\"].use(vue_router__WEBPACK_IMPORTED_MODULE_2__[\"default\"]);\nconst router = new vue_router__WEBPACK_IMPORTED_MODULE_2__[\"default\"]({\n  mode: 'history',\n  routes: [{\n    path: '/',\n    component: _components_VideoList__WEBPACK_IMPORTED_MODULE_4__[\"default\"],\n    props: {\n      path: ''\n    }\n  }, {\n    path: '/list/*',\n    component: _components_VideoList__WEBPACK_IMPORTED_MODULE_4__[\"default\"],\n    props: route => ({\n      path: route.params[0]\n    })\n  }, {\n    path: '/video/*',\n    component: _components_Video__WEBPACK_IMPORTED_MODULE_5__[\"default\"],\n    props: route => ({\n      path: route.params[0]\n    })\n  }]\n});\nnew vue__WEBPACK_IMPORTED_MODULE_0__[\"default\"]({\n  router,\n  store: _store__WEBPACK_IMPORTED_MODULE_3__[\"default\"]\n}).$mount('#app');\n\n//# sourceURL=webpack:///./src/main.js?");
+
+/***/ }),
+
+/***/ "./src/mixins/VideoUtil.vue":
+/*!**********************************!*\
+  !*** ./src/mixins/VideoUtil.vue ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./VideoUtil.vue?vue&type=script&lang=js& */ \"./src/mixins/VideoUtil.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ \"./node_modules/vue-loader/lib/runtime/componentNormalizer.js\");\nvar render, staticRenderFns\n\n\n\n\n/* normalize component */\n\nvar component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__[\"default\"])(\n  _VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"],\n  render,\n  staticRenderFns,\n  false,\n  null,\n  null,\n  null\n  \n)\n\n/* hot reload */\nif (false) { var api; }\ncomponent.options.__file = \"src/mixins/VideoUtil.vue\"\n/* harmony default export */ __webpack_exports__[\"default\"] = (component.exports);\n\n//# sourceURL=webpack:///./src/mixins/VideoUtil.vue?");
+
+/***/ }),
+
+/***/ "./src/mixins/VideoUtil.vue?vue&type=script&lang=js&":
+/*!***********************************************************!*\
+  !*** ./src/mixins/VideoUtil.vue?vue&type=script&lang=js& ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib!../../node_modules/vue-loader/lib??vue-loader-options!./VideoUtil.vue?vue&type=script&lang=js& */ \"./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js?!./src/mixins/VideoUtil.vue?vue&type=script&lang=js&\");\n/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__[\"default\"] = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_VideoUtil_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__[\"default\"]); \n\n//# sourceURL=webpack:///./src/mixins/VideoUtil.vue?");
 
 /***/ }),
 

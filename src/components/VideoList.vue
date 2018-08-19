@@ -17,7 +17,7 @@ div
 </template>
 
 <script>
-import VideoUtil from './VideoUtil'
+import VideoUtil from '../mixins/VideoUtil'
 
 export default {
   mixins: [VideoUtil],

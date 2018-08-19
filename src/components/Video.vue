@@ -16,7 +16,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VideoPlayer from './VideoPlayer'
 import SceneList from './SceneList'
-import VideoUtil from './VideoUtil'
+import VideoUtil from '../mixins/VideoUtil'
 
 Vue.use(Vuex)
 
