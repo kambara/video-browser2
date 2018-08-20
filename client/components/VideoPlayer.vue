@@ -41,9 +41,11 @@
 <script>
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueCookies from 'vue-cookies'
 import VideoUtil from '../mixins/VideoUtil'
 
 Vue.use(Vuex)
+Vue.use(VueCookies)
 
 export default {
   mixins: [VideoUtil],
@@ -88,6 +90,10 @@ export default {
   },
   created: async function() {
     setInterval(() => this.updateTime(), 100)
+    const vol = this.$cookies.get('volume')
+    if (vol != null) {
+      this.volume = vol
+    }
     this.hideControlLater()
   },
   mounted () {
@@ -122,6 +128,12 @@ export default {
     updatePaused(event) {
       this.paused = event.target.paused
     },
+    updateVideoVolume() {
+      if (this.videoElement) {
+        const vol = this.volume * this.volume
+        this.videoElement.volume = vol
+      }
+    },
     //
     // Video Event
     //
@@ -131,6 +143,7 @@ export default {
     onVideoCanPlay(event) {
       if (!this.videoElement) {
         this.videoElement = event.target
+        this.updateVideoVolume()
       }
       this.loaded = true
     },
@@ -183,10 +196,9 @@ export default {
     // Volume Event
     //
     onVolumeInput (event) {
-      if (this.videoElement) {
-        this.volume = event.target.value
-        this.videoElement.volume = this.volume
-      }
+      this.volume = event.target.value
+      this.updateVideoVolume()
+      this.$cookies.set('volume', this.volume, '1Y')
     },
     //
     // Fullscreen Event
