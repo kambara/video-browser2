@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { ViewMode } from './enum'
 
 Vue.use(Vuex)
 
@@ -9,7 +10,8 @@ const store = new Vuex.Store({
     duration: 0,
     allScenesImagePath: null,
     sceneInterval: null,
-    videoStartTime: 0
+    videoStartTime: 0,
+    viewMode: ViewMode.PLAYER
   },
   getters: {
     timestamps: state => {
@@ -41,6 +43,9 @@ const store = new Vuex.Store({
       state.duration = Math.floor(info.duration)
       state.sceneInterval = info.interval
       state.allScenesImagePath = info.allScenesImagePath
+    },
+    setViewMode(state, viewMode) {
+      state.viewMode = viewMode
     }
   },
   actions: {
@@ -59,6 +64,20 @@ const store = new Vuex.Store({
     },
     startVideoAt({ commit }, time) {
       commit('setVideoStartTime', time)
+      commit('setViewMode', ViewMode.PLAYER)
+    },
+    switchToPlayerMode({ commit }) {
+      commit('setViewMode', ViewMode.PLAYER)
+    },
+    switchToSceneListMode({ commit }) {
+      commit('setViewMode', ViewMode.SCENE_LIST)
+    },
+    toggleViewMode({ commit, state }) {
+      if (state.viewMode === ViewMode.PLAYER) {
+        commit('setViewMode', ViewMode.SCENE_LIST)
+      } else {
+        commit('setViewMode', ViewMode.PLAYER)
+      }
     },
   }
 })

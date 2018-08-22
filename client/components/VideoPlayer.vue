@@ -1,41 +1,47 @@
 <template lang="pug">
 .video-container(
-  @mousemove='onVideoMouseMove'
-  :style="{ width: width+'px', height: height+'px' }")
+  @mousemove="onVideoMouseMove"
+  :style="{ }")
   video(
-    type='video/mp4'
-    :src='$store.getters.src'
-    :autoplay='isAutoPlay'
-    :width='width'
-    :height='height'
-    @canplay='onVideoCanPlay'
-    @loadstart='onVideoLoadStart'
-    @playing='updatePaused'
-    @pause='updatePaused'
-    @ended='onVideoEnded')
-  transition(name='fade')
-    .controls(v-if='isControlVisible')
+    type="video/mp4"
+    :src="$store.getters.src"
+    :autoplay="isAutoPlay"
+    :width="width"
+    :height="height"
+    @canplay="onVideoCanPlay"
+    @loadstart="onVideoLoadStart"
+    @playing="updatePaused"
+    @pause="updatePaused"
+    @ended="onVideoEnded")
+  transition(name="fade")
+    .controls(v-if="isControlVisible")
       input.seek-bar(
-        type='range'
-        :value='currentTimeSec'
-        :max='$store.state.duration'
-        @input='onSeekBarInput'
-        @change='onSeekBarChange')
-      div
-        button.fullscreen-button(@click='toggleFullscreen')
-          i.fas.fa-lg(:class='fullscreenButtonClass')
-        button.play-button(:disabled='!loaded' @click='onPlayButtonClick')
-          i.fas.fa-lg(:class='playButtonClass')
-        input.volume(
-          type='range'
-          max='1'
-          step='0.01'
-          :value='volume'
-          @input='onVolumeInput')
-        span.time
-          | {{ formatTime(currentTimeSec) }}
-          | /
-          | {{ formatTime($store.state.duration) }}
+        type="range"
+        :value="currentTimeSec"
+        :max="$store.state.duration"
+        @input="onSeekBarInput"
+        @change="onSeekBarChange")
+      .bottom
+        .left
+          button.play-button(:disabled="!loaded" @click.stop="onPlayButtonClick")
+            i.fas.fa-lg(:class="playButtonClass")
+          input.volume(
+            type="range"
+            max="1"
+            step="0.01"
+            :value="volume"
+            @input.stop="onVolumeInput"
+            @click.stop
+            )
+          span.time
+            | {{ formatTime(currentTimeSec) }}
+            | /
+            | {{ formatTime($store.state.duration) }}
+        .right
+          button(@click.stop="toggleViewMode" v-if="!isFullscreen")
+            i.fas.fa-lg.fa-th
+          button(@click.stop="toggleFullscreen")
+            i.fas.fa-lg(:class="fullscreenButtonClass")
 </template>
 
 <script>
@@ -96,17 +102,12 @@ export default {
     }
     this.hideControlLater()
   },
-  mounted () {
-    this.onWindowResize()
-    window.addEventListener('resize', this.onWindowResize)
-  },
   beforeDestroy () {
     this.pause()
     if (this.videoElement) {
       this.videoElement.removeAttribute('src')
       this.videoElement.load()
     }
-    window.removeEventListener('resize', this.onWindowResize)
   },
   methods: {
     play() {
@@ -213,12 +214,8 @@ export default {
         this.isFullscreen = true
       }
     },
-    //
-    // Window Resize Event
-    //
-    onWindowResize () {
-      this.width = window.innerWidth
-      this.height = window.innerHeight
+    toggleViewMode() {
+      this.$store.dispatch('toggleViewMode')
     }
   }
 }
@@ -233,8 +230,13 @@ export default {
 
 .video-container
   position relative
+  width 100%
+  height 100%
 
   video
+    display block
+    width 100%
+    height 100%
     background-color black
 
   .controls
@@ -243,7 +245,13 @@ export default {
     width 100%
     padding 16px 16px
     box-sizing border-box
-    background-color rgba(0, 0, 0, 0.3)
+    // background-color rgba(0, 0, 0, 0.3)
+
+    .bottom
+      display flex
+
+      .left
+        margin-right auto
 
     input[type="range"]
       -webkit-appearance none
@@ -251,9 +259,10 @@ export default {
       box-sizing border-box
       margin 8px 0
       border-radius 3px
-      background-color rgba(255, 255, 255, 0.3)
+      background-color rgba(255, 255, 255, 0.4)
       outline 0
       cursor pointer
+      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
 
       &::-webkit-slider-thumb
         -webkit-appearance none
@@ -272,7 +281,7 @@ export default {
 
       &.volume
         display inline-block
-        width 100px
+        width 80px
         margin 8px 10px
         vertical-align middle
 
@@ -285,6 +294,7 @@ export default {
       border-radius 6px
       outline 0
       cursor pointer
+      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
 
       &:hover
         background-color rgba(0, 0, 0, 0.5)
@@ -294,7 +304,8 @@ export default {
 
       &.play-button
         width 56px
-        
-      &.fullscreen-button
-        float right
+
+    .time
+      font-size 12px
+      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
 </style>
