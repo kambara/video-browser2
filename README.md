@@ -35,7 +35,7 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 ## TODO
 
 優先度高
-- シーンリストから再生
+
 - キー操作
 - 一括サムネイル生成
 
