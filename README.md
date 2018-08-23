@@ -1,10 +1,10 @@
-
 ## Install
 
 ### Prerequirements
 
 - Node.js
 - FFmpeg
+- Redis
 - Yarn
 
 ### Install

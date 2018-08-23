@@ -1,9 +1,8 @@
 const crypto = require('crypto')
-const fs = require('fs')
+const fs = require('fs-extra-promise')
 const path = require('path')
 const config = require('config')
 const ffmpeg = require('fluent-ffmpeg')
-const mkpath = require('mkpath')
 const Jimp = require('jimp')
 
 module.exports = class Video {
@@ -28,9 +27,15 @@ module.exports = class Video {
     return hash.digest('hex')
   }
 
-  getMetadata(callback) {
-    ffmpeg.ffprobe(this.getVideoPath(), (err, metadata) => {
-      callback(err, metadata)
+  async getMetadata() {
+    return new Promise((resolve, reject) => {
+      ffmpeg.ffprobe(this.getVideoPath(), (err, metadata) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(metadata)
+        }
+      })
     })
   }
 
@@ -52,10 +57,6 @@ module.exports = class Video {
     return this.md5() + '.jpg'
   }
 
-  existAllScenesImage() {
-    return fs.existsSync(this.getAllScenesImagePath())
-  }
-
   //
   // Thumbnail Images
   //
@@ -71,24 +72,22 @@ module.exports = class Video {
     return path.join(this.getThumbnailsDirPath(), time + '.jpg')
   }
 
-  getThumbnailsCount() {
-    if (!fs.existsSync(this.getThumbnailsDirPath())) {
+  async getThumbnailsCount() {
+    if (! await fs.existsAsync(this.getThumbnailsDirPath()) ) {
       return 0
     }
-    return fs.readdirSync(this.getThumbnailsDirPath())
-      .filter(entry => !!entry.match(/\.jpg$/))
-      .length
+    const entries = await fs.readdirAsync(this.getThumbnailsDirPath())
+    return entries.filter(entry => !!entry.match(/\.jpg$/)).length
   }
 
   //
   // Generate Thumbnails
   //
-  generateThumbnails() {
-    this.getMetadata((err, metadata) => {
-      mkpath.sync(this.getThumbnailsDirPath())
-      const duration = Math.floor(metadata.format.duration)
-      this._generateThumbnails(duration, 10, 0)
-    })
+  async generateThumbnails() {
+    const metadata = await this.getMetadata()
+    const duration = Math.floor(metadata.format.duration)
+    await fs.mkdirpAsync(this.getThumbnailsDirPath())
+    this._generateThumbnails(duration, 10, 0)
   }
 
   _generateThumbnails(duration, interval, time) {
