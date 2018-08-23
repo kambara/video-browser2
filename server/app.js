@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(stylus.middleware(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'data/public')))
+app.use('/thumbnails', express.static(path.join(__dirname, 'data/thumbnails')))
 
 app.use('/api', apiRouter)
 app.use('/', indexRouter)

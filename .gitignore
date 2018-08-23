@@ -67,4 +67,4 @@ typings/
 config/*.json
 
 # thumbnails
-data/
+server/data/
