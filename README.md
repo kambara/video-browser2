@@ -36,15 +36,17 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- キー操作
 - 一括サムネイル生成
 
 優先度中
 
+- シーク直後にサムネイルをposter表示
 - シークバーサムネイル
 - ランダム表示
 - 検索
+- タッチ操作
 
 優先度低
 
 - サムネイル進捗表示
+- キーフレーム抽出
