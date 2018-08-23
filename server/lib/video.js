@@ -44,7 +44,7 @@ module.exports = class Video {
   getAllScenesImagePath() {
     return path.join(
       __dirname,
-      '../data/public/thumbnails',
+      '../data/thumbnails',
       this.getAllScenesImageFileName())
   }
 
@@ -64,7 +64,7 @@ module.exports = class Video {
   }
 
   getThumbnailsDirPath() {
-    return path.join(__dirname, '../data/public/thumbnails', this.md5())
+    return path.join(__dirname, '../data/thumbnails', this.md5())
   }
 
   getThumbnailImagePath(time) {

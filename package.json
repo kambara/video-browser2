@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "./node_modules/nodemon/bin/nodemon.js --watch routes ./bin/www & webpack --watch",
-    "start": "node ./bin/www"
+    "dev": "./node_modules/nodemon/bin/nodemon.js --watch ./server/routes ./server/bin/www & webpack --watch",
+    "start": "node ./server/bin/www"
   },
   "dependencies": {
     "config": "^2.0.1",

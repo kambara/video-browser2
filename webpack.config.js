@@ -6,7 +6,7 @@ module.exports = {
   mode: 'development',
   entry: './client/main.js',
   output: {
-    path: path.join(__dirname, 'public/javascripts/'),
+    path: path.join(__dirname, 'server/public/javascripts/'),
     publicPath: '/javascripts/',
     filename: 'build.js'
   },
