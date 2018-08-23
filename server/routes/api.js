@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const ffmpeg = require('fluent-ffmpeg')
-const Video = require('./video')
-const VideoDir = require('./video-dir')
+const Video = require('../lib/video')
+const VideoDir = require('../lib/video-dir')
 
 router.get('/list/*', function(req, res) {
   const videoDir = new VideoDir(req.params[0])
