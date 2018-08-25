@@ -32,11 +32,11 @@ export default {
   position fixed
   z-index 1
   bottom 8px
-  right 8px
+  right 12px
   width 200px
   padding 10px 16px
-  background-color #333333
-  border-radius 6px
+  background-color #3C3C3C
+  border-radius 3px
   font-size 12px
 
   .message

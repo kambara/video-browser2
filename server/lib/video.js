@@ -83,18 +83,38 @@ module.exports = class Video extends EventEmitter {
   }
 
   //
-  // Generate Thumbnails
+  // Create thumbnails
   //
   async createThumbnails() {
+    await fs.mkdirpAsync(this.getThumbnailsDirPath())
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
-    await fs.mkdirpAsync(this.getThumbnailsDirPath())
     for (let time = 0; time < duration; time += config.sceneInterval) {
       console.log(`Create thumbnail (${time}/${duration}) ${this.basename()}`)
       await this.createThumbnailAt(time)
       this.emit('thumbnail-progress', time, duration)
     }
     await this.createSpriteImage()
+  }
+
+  async existThumbnails() {
+    // Check directory
+    if (!await fs.existsAsync(this.getThumbnailsDirPath())) {
+      return false
+    }
+    // Check thumbnails
+    const metadata = await this.getMetadata()
+    const duration = Math.floor(metadata.format.duration)
+    for (let time = 0; time < duration; time += config.sceneInterval) {
+      if (!await fs.existsAsync(this.getThumbnailImagePath(time))) {
+        return false
+      }
+    }
+    // Check allScenesImage
+    if (!await fs.existsAsync(this.getAllScenesImagePath())) {
+      return false
+    }
+    return true
   }
 
   createThumbnailAt(time) {

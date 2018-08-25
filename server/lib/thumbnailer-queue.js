@@ -27,10 +27,12 @@ const ThumbnailerQueue = {
 
 queue.process('thumbnail', async (job, done) => {
   const video = new Video(job.data.relativePath)
-  video.on('thumbnail-progress', (time, duration) => {
-    job.progress(time, duration)
-  })
-  await video.createThumbnails()
+  if (!await video.existThumbnails()) {
+    video.on('thumbnail-progress', (time, duration) => {
+      job.progress(time, duration)
+    })
+    await video.createThumbnails()
+  }
   done()
 })
 
@@ -64,18 +66,25 @@ queue.on('job complete', async () => {
   })
   const inactiveCount = await getInactiveCount()
   if (inactiveCount == 0) {
-    removeCompletedJobs()
+    removeAllJobs()
   }
 })
 
-function removeCompletedJobs() {
+function removeAllJobs() {
   queue.complete((err, ids) => {
-    ids.forEach((id) => {
-      kue.Job.get(id, (err, job) => {
-        job.remove((err) => {
-          if (err) throw err
-          console.log('Removed completed job:', job.data.title)
-        })
+    removeJobs(ids)
+  })
+  queue.active((err, ids) => {
+    removeJobs(ids)
+  })
+}
+
+function removeJobs(ids) {
+  ids.forEach((id) => {
+    kue.Job.get(id, (err, job) => {
+      job.remove((err) => {
+        if (err) throw err
+        console.log('Removed completed job:', job.data.title)
       })
     })
   })
