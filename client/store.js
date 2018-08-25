@@ -11,7 +11,18 @@ const store = new Vuex.Store({
     allScenesImagePath: null,
     sceneInterval: null,
     videoStartTime: 0,
-    viewMode: ViewMode.PLAYER
+    viewMode: ViewMode.PLAYER,
+    socket: {
+      isConnected: false,
+      reconnectError: false,
+    },
+    thumbnailerQueue: {
+      title: '',
+      progress: 0,
+      totalCount: 0,
+      completeCount: 0,
+      failedCount: 0,
+    }
   },
   getters: {
     timestamps: state => {
@@ -29,7 +40,7 @@ const store = new Vuex.Store({
         return ''
       }
       const sec = Math.floor(state.videoStartTime / 1000)
-      return `/api/video-file/${state.videoPath}?time=${sec}`
+      return `/api/video/file/${state.videoPath}?time=${sec}`
     }
   },
   mutations: {
@@ -46,7 +57,36 @@ const store = new Vuex.Store({
     },
     setViewMode(state, viewMode) {
       state.viewMode = viewMode
-    }
+    },
+    SOCKET_THUMBNAILER_PROGRESS(state, info) {
+      state.thumbnailerQueue = info.thumbnailerQueue
+    },
+    SOCKET_THUMBNAILER_COMPLETE(state) {
+      console.log('complete')
+      state.thumbnailerQueue = {
+        title: '',
+        progress: 0,
+        totalCount: 0,
+        completeCount: 0,
+      }
+    },
+    SOCKET_ONOPEN(state) {
+      state.socket.isConnected = true
+    },
+    SOCKET_ONCLOSE(state) {
+      state.socket.isConnected = false
+      console.warn('WebSocket: closed')
+    },
+    SOCKET_RECONNECT() {
+      console.info('WebSocket: reconnected')
+    },
+    SOCKET_RECONNECT_ERROR(state) {
+      state.socket.reconnectError = true
+      console.error('WebSocket: unable to reconnect')
+    },
+    SOCKET_ONERROR ()  {
+      console.error('WebSocket: unable to connect')
+    },
   },
   actions: {
     initVideo({ commit, dispatch }, path) {
@@ -57,7 +97,7 @@ const store = new Vuex.Store({
       }
     },
     async loadVideoInfo({ commit, state }) {
-      const url = `/api/video-info/${state.videoPath}`
+      const url = `/api/video/info/${state.videoPath}`
       const response = await fetch(url)
       const json = await response.json()
       commit('setVideoInfo', json)

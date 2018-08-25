@@ -1,10 +1,10 @@
-
 ## Install
 
 ### Prerequirements
 
 - Node.js
 - FFmpeg
+- Redis
 - Yarn
 
 ### Install
@@ -28,6 +28,10 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
     yarn run webpack
 
+#### Kue Dashboard
+
+    yarn run kue-dashboard -p 3002
+
 ### Production mode
 
     yarn start
@@ -48,5 +52,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度低
 
+- 次の動画に進む
 - サムネイル進捗表示
 - キーフレーム抽出
