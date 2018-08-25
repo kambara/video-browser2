@@ -16,7 +16,7 @@ router.get('/video/info/*', async function(req, res) {
   const metadata = await video.getMetadata()
   res.json({
     duration: metadata.format.duration,
-    allScenesImagePath: video.getAllScenesImagePublicPath(),
+    spriteImagePath: video.getSpriteImagePublicPath(),
     interval: 10
   })
 })

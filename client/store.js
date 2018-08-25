@@ -8,7 +8,7 @@ const store = new Vuex.Store({
   state: {
     videoPath: null,
     duration: 0,
-    allScenesImagePath: null,
+    spriteImagePath: null,
     sceneInterval: null,
     videoStartTime: 0,
     viewMode: ViewMode.PLAYER,
@@ -53,7 +53,7 @@ const store = new Vuex.Store({
     setVideoInfo(state, info) {
       state.duration = Math.floor(info.duration)
       state.sceneInterval = info.interval
-      state.allScenesImagePath = info.allScenesImagePath
+      state.spriteImagePath = info.spriteImagePath
     },
     setViewMode(state, viewMode) {
       state.viewMode = viewMode
