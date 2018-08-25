@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     async onCreateThumbnailsButtonClick () {
-      const response = await fetch(`/api/video/create-thumbnails/${this.path}`)
+      const response = await fetch(`/api/video/thumbnails/create/${this.path}`)
       const json = await response.json()
       console.log(json)
     },

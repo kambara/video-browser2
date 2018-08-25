@@ -22,6 +22,28 @@ module.exports = class VideoDir {
       })
   }
 
+  async getSubDirs() {
+    const subDirs = []
+    for (const entry of await this.getEntries()) {
+      const entryPath = path.join(this.getAbsolutePath(), entry)
+      const stats = await fs.statAsync(entryPath)
+      if (stats.isDirectory()) {
+        const relPath = path.join(this.relativePath, entry)
+        subDirs.push(new VideoDir(relPath))
+      }
+    }
+    return subDirs
+  }
+
+  async getVideosRecursive() {
+    let videos = await this.getVideos()
+    for (const videoDir of await this.getSubDirs()) {
+      const subDirVideos = await videoDir.getVideosRecursive()
+      videos = videos.concat(subDirVideos)
+    }
+    return videos
+  }
+
   async getEntries() {
     const entries = await fs.readdirAsync(this.getAbsolutePath())
     return entries.filter(entry => {
@@ -78,13 +100,7 @@ module.exports = class VideoDir {
       return path.join(this.relativePath, videoFileName)
     }
     // Find sub directories
-    const subDirs = entries.filter(async entry => {
-      const entryPath = path.join(this.getAbsolutePath(), entry)
-      const stats = await fs.statAsync(entryPath)
-      return stats.isDirectory()
-    })
-    for (const dir of subDirs) {
-      const videoDir = new VideoDir(path.join(this.relativePath, dir))
+    for (const videoDir of await this.getSubDirs()) {
       const videoPath = await videoDir.findFirstVideo()
       if (videoPath) {
         return videoPath

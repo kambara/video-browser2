@@ -47,14 +47,23 @@ router.get('/video/file/*', async function(req, res) {
     .pipe(res, { end: true })
 })
 
-router.get('/video/create-thumbnails/*', function(req, res) {
+router.get('/video/thumbnails/create/*', function(req, res) {
   ThumbnailerQueue.addJob(req.params[0])
   res.json({})
 })
 
-router.get('/dir/create-thumbnails/*', async function(req, res) {
+router.get('/dir/thumbnails/create/*', async function(req, res) {
   const videoDir = new VideoDir(req.params[0])
   const videos = await videoDir.getVideos()
+  for (const video of videos) {
+    ThumbnailerQueue.addJob(video.relativePath)
+  }
+  res.json({})
+})
+
+router.get('/dir/thumbnails/create-recursive/*', async function(req, res) {
+  const videoDir = new VideoDir(req.params[0])
+  const videos = await videoDir.getVideosRecursive()
   for (const video of videos) {
     ThumbnailerQueue.addJob(video.relativePath)
   }
