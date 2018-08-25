@@ -48,6 +48,7 @@ const store = new Vuex.Store({
       state.videoPath = path
     },
     setVideoStartTime(state, time) {
+      console.log(`Store: setVideoStartTime: ${Math.floor(time/1000)} sec ${Math.floor(time/1000/60)} min`)
       state.videoStartTime = time
     },
     setVideoInfo(state, info) {

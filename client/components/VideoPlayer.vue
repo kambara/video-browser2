@@ -86,11 +86,14 @@ export default {
   },
   watch: {
     '$store.state.videoStartTime' () {
+      console.log(`VideoPlayer: Update currentTime: ${Math.floor(this.$store.state.videoStartTime / 1000)} sec`)
       this.currentTime = this.$store.state.videoStartTime
     }
   },
   created: async function() {
-    setInterval(() => this.updateTime(), 100)
+    this.intervalIdOfUpdateTime = setInterval(() => {
+      this.updateTime()
+    }, 100)
     const vol = this.$cookies.get('volume')
     if (vol != null) {
       this.volume = vol
@@ -101,6 +104,8 @@ export default {
     window.addEventListener('keydown', this.onKeydown)
   },
   beforeDestroy() {
+    window.removeEventListener('keydown', this.onKeydown)
+    clearInterval(this.intervalIdOfUpdateTime)
     this.pause()
     if (this.videoElement) {
       this.videoElement.removeAttribute('src')
@@ -111,6 +116,7 @@ export default {
     play() {
       this.paused = false
       if (this.videoElement) {
+        this.updateTime()
         this.videoElement.play()
       }
     },
@@ -246,6 +252,8 @@ export default {
         this.toggleFullscreen()
         break
       case 'ArrowRight':
+        console.log('---')
+        console.log(`VideoPlayer: ArrowRight: ${this.currentTime / 1000} sec ${Math.floor(this.currentTime/1000/60)} min`)
         this.$store.dispatch('startVideoAt', this.currentTime + 10 * 1000)
         this.showAndHideControlLater()
         break
@@ -262,7 +270,7 @@ export default {
         this.showAndHideControlLater()
         break
       }
-    }
+    },
   }
 }
 </script>
