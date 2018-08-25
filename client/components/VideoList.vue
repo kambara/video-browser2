@@ -6,6 +6,9 @@ div
         i.fas.fa-arrow-left
       h2
         | {{ basename(path) }}
+    div
+      button(@click="onCreateThumbnailsButtonClick")
+        | Create Thumbnails
   ul
     li(v-for="(entry, index) in entries", :key="index")
       div(v-if="entry.type == 'directory'")
@@ -48,7 +51,7 @@ export default {
   },
   methods: {
     async updateEntries() {
-      const response = await fetch(`/api/list/${this.path}`)
+      const response = await fetch(`/api/dir/list/${this.path}`)
       this.entries = await response.json()
     },
     representativeScenes(entry) {
@@ -62,6 +65,11 @@ export default {
       }
       return results
     },
+    async onCreateThumbnailsButtonClick() {
+      const response = await fetch(`/api/dir/create-thumbnails/${this.path}`)
+      const json = await response.json()
+      console.log(json)
+    }
   }
 }
 </script>

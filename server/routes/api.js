@@ -3,14 +3,15 @@ const router = express.Router()
 const ffmpeg = require('fluent-ffmpeg')
 const Video = require('../lib/video')
 const VideoDir = require('../lib/video-dir')
+const ThumbnailerQueue = require('../lib/thumbnailer-queue')
 
-router.get('/list/*', async function(req, res) {
+router.get('/dir/list/*', async function(req, res) {
   const videoDir = new VideoDir(req.params[0])
   const json = await videoDir.getEntriesJson()
   res.json(json)
 })
 
-router.get('/video-info/*', async function(req, res) {
+router.get('/video/info/*', async function(req, res) {
   const video = new Video(req.params[0])
   const metadata = await video.getMetadata()
   res.json({
@@ -20,7 +21,7 @@ router.get('/video-info/*', async function(req, res) {
   })
 })
 
-router.get('/video-file/*', async function(req, res) {
+router.get('/video/file/*', async function(req, res) {
   const time = req.query.time ? parseInt(req.query.time) : 0
   const video = new Video(req.params[0])
   const metadata = await video.getMetadata()
@@ -46,10 +47,28 @@ router.get('/video-file/*', async function(req, res) {
     .pipe(res, { end: true })
 })
 
-router.get('/generate-thumbnails/*', function(req, res) {
-  const video = new Video(req.params[0])
-  video.generateThumbnails()
+router.get('/video/create-thumbnails/*', function(req, res) {
+  ThumbnailerQueue.addJob(req.params[0])
   res.json({})
+})
+
+router.get('/dir/create-thumbnails/*', async function(req, res) {
+  const videoDir = new VideoDir(req.params[0])
+  const videos = await videoDir.getVideos()
+  for (const video of videos) {
+    ThumbnailerQueue.addJob(video.relativePath)
+  }
+  res.json({})
+})
+
+router.get('/thumbnails/progress', async (req, res) => {
+  const queuedCount = await ThumbnailerQueue.getQueuedCount()
+  const activeJob = await ThumbnailerQueue.getActiveJob()
+  res.json({
+    queuedCount: queuedCount,
+    title: activeJob ? activeJob.data.title : null,
+    progress: activeJob ? activeJob._progress : null,
+  })
 })
 
 module.exports = router

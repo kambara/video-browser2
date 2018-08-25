@@ -12,6 +12,16 @@ module.exports = class VideoDir {
     return path.join(config.videoRoot, this.relativePath)
   }
 
+  async getVideos() {
+    const entries = await this.getEntries()
+    return entries
+      .filter(entry => this.isVideo(entry))
+      .map(entry => {
+        const relPath = path.join(this.relativePath, entry)
+        return new Video(relPath)
+      })
+  }
+
   async getEntries() {
     const entries = await fs.readdirAsync(this.getAbsolutePath())
     return entries.filter(entry => {

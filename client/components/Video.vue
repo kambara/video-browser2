@@ -12,8 +12,8 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
   .video-info-container
     .header
       h1 {{ basename(path) }}
-      button(@click="onGenerateThumbnailsButtonClick")
-        | Generate Thumbnails
+      button(@click="onCreateThumbnailsButtonClick")
+        | Create Thumbnails
     scene-list
 </template>
 
@@ -48,8 +48,8 @@ export default {
     this.hideNavigationLater()
   },
   methods: {
-    async onGenerateThumbnailsButtonClick () {
-      const response = await fetch(`/api/generate-thumbnails/${this.path}`)
+    async onCreateThumbnailsButtonClick () {
+      const response = await fetch(`/api/video/create-thumbnails/${this.path}`)
       const json = await response.json()
       console.log(json)
     },

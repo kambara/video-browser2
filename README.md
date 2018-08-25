@@ -28,6 +28,10 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
     yarn run webpack
 
+#### Kue Dashboard
+
+    yarn run kue-dashboard -p 3050
+
 ### Production mode
 
     yarn start

@@ -29,7 +29,7 @@ const store = new Vuex.Store({
         return ''
       }
       const sec = Math.floor(state.videoStartTime / 1000)
-      return `/api/video-file/${state.videoPath}?time=${sec}`
+      return `/api/video/file/${state.videoPath}?time=${sec}`
     }
   },
   mutations: {
@@ -57,7 +57,7 @@ const store = new Vuex.Store({
       }
     },
     async loadVideoInfo({ commit, state }) {
-      const url = `/api/video-info/${state.videoPath}`
+      const url = `/api/video/info/${state.videoPath}`
       const response = await fetch(url)
       const json = await response.json()
       commit('setVideoInfo', json)

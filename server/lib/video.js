@@ -1,12 +1,14 @@
 const crypto = require('crypto')
+const EventEmitter = require('events')
 const fs = require('fs-extra-promise')
 const path = require('path')
 const config = require('config')
 const ffmpeg = require('fluent-ffmpeg')
 const Jimp = require('jimp')
 
-module.exports = class Video {
+module.exports = class Video extends EventEmitter {
   constructor(relativePath) {
+    super()
     this.relativePath = relativePath
     this.thumbnailWidth = 160
     this.thumbnailHeight = 90
@@ -83,93 +85,80 @@ module.exports = class Video {
   //
   // Generate Thumbnails
   //
-  async generateThumbnails() {
+  async createThumbnails() {
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
     await fs.mkdirpAsync(this.getThumbnailsDirPath())
-    this._generateThumbnails(duration, 10, 0)
+    for (let time = 0; time < duration; time += config.sceneInterval) {
+      console.log(`Create thumbnail (${time}/${duration}) ${this.basename()}`)
+      await this.createThumbnailAt(time)
+      this.emit('progress', time, duration)
+    }
+    await this.createSpriteImage()
   }
 
-  _generateThumbnails(duration, interval, time) {
-    console.log(`Thumbnail: ${time} / ${duration} - ${this.basename()}`)
-    ffmpeg(this.getVideoPath())
-      .seekInput(time)
-      .format('image2')
-      .noAudio()
-      .videoFilters([
-        {
-          filter: 'scale',
-          options: [
-            `min(trunc(oh*a*sar/2)*2, ${this.thumbnailWidth})`,
-            this.thumbnailHeight
-          ]
-        },
-        {
-          filter: 'pad',
-          options: [
-            this.thumbnailWidth,
-            this.thumbnailHeight,
-            '(ow-iw)/2',
-            '(oh-ih)/2'
-          ]
-        }
-      ])
-      .outputOptions([
-        '-vframes 1',
-        '-vsync 0',
-      ])
-      .on('end', () => {
-        if (time + interval > duration) {
-          console.log('Finish generating all thumbnails:', this.getThumbnailsDirPath())
-          // Generate all scenes image
-          this.generateAllScenesImage(duration, interval)
-        } else {
-          // Generate next image
-          this._generateThumbnails(duration, interval, time + interval)
-        }
-      })
-      .on('error', (err) => {
-        console.log('Cannot create thumbnails: ' + err.message)
-      })
-      // .on('stderr', stderr => console.log('    ffmpeg:', stderr))
-      .save(this.getThumbnailImagePath(time))
-  }
-
-  //
-  // Generate AllScenesImage
-  //
-  generateAllScenesImage(duration, interval) {
-    console.log('Generate base image')
-    duration = Math.floor(duration)
-    const imageCount = Math.floor(duration / interval)
-    const rows = Math.ceil(imageCount / this.allScenesImageColumns)
-    const width = this.thumbnailWidth * this.allScenesImageColumns
-    const height = this.thumbnailHeight * rows
-    new Jimp(width, height, (err, image) => {
-      console.log(imageCount, interval, image, 0)
-      this._addToBaseImage(imageCount, interval, image, 0)
+  createThumbnailAt(time) {
+    return new Promise((resolve, reject) => {
+      ffmpeg(this.getVideoPath())
+        .seekInput(time)
+        .format('image2')
+        .noAudio()
+        .videoFilters([
+          {
+            filter: 'scale',
+            options: [
+              `min(trunc(oh*a*sar/2)*2, ${this.thumbnailWidth})`,
+              this.thumbnailHeight
+            ]
+          },
+          {
+            filter: 'pad',
+            options: [
+              this.thumbnailWidth,
+              this.thumbnailHeight,
+              '(ow-iw)/2',
+              '(oh-ih)/2'
+            ]
+          }
+        ])
+        .outputOptions([
+          '-vframes 1',
+          '-vsync 0',
+        ])
+        .on('end', () => {
+          resolve()
+        })
+        .on('error', (err) => {
+          console.error('Cannot create thumbnails: ' + err.message)
+          reject()
+        })
+        // .on('stderr', stderr => console.log('    ffmpeg:', stderr))
+        .save(this.getThumbnailImagePath(time))
     })
   }
 
-  _addToBaseImage(imageCount, interval, baseImage, currentIndex) {
-    console.log('Add to base image:', `${currentIndex} / ${imageCount} - ${this.basename()}`)
-    const imagePath = this.getThumbnailImagePath(currentIndex * interval)
-    const x = 160 * (currentIndex % this.allScenesImageColumns)
-    const y = 90 * Math.floor(currentIndex / this.allScenesImageColumns)
-    Jimp.read(imagePath)
-      .then(image => {
-        baseImage.blit(image, x, y)
-        if (currentIndex == imageCount) {
-          console.log('Saving')
-          baseImage.quality(90)
-          baseImage.write(this.getAllScenesImagePath())
-          console.log('Finish generating image:', this.getAllScenesImagePath())
-        } else {
-          this._addToBaseImage(imageCount, interval, baseImage, currentIndex + 1)
+  async createSpriteImage() {
+    return new Promise(async resolve => {
+      console.log('Creating sprite image')
+      const metadata = await this.getMetadata()
+      const duration = Math.floor(metadata.format.duration)
+      const imageCount = Math.ceil(duration / config.sceneInterval)
+      const rows = Math.ceil(imageCount / this.allScenesImageColumns)
+      const baseWidth = this.thumbnailWidth * this.allScenesImageColumns
+      const baseHeight = this.thumbnailHeight * rows
+      new Jimp(baseWidth, baseHeight, async (err, baseImage) => {
+        for (let index = 0; index < imageCount; index++) {
+          const imagePath = this.getThumbnailImagePath(index * config.sceneInterval)
+          const image = await Jimp.read(imagePath)
+          const x = 160 * (index % this.allScenesImageColumns)
+          const y = 90 * Math.floor(index / this.allScenesImageColumns)
+          baseImage.blit(image, x, y)
         }
+        baseImage.quality(90)
+        baseImage.write(this.getAllScenesImagePath())
+        console.log('Sprite image:', this.getAllScenesImagePath())
+        resolve()
       })
-      .catch(err => {
-        console.error(err.message)
-      })
+    })
   }
 }
