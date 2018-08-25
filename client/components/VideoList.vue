@@ -27,10 +27,12 @@ div
           .scenes(v-if="entry.thumbnailsCount > 0")
             img(v-for="(path, index) in representativeScenes(entry)"
               :src="path")
+  thumbnailer-progress
 </template>
 
 <script>
 import VideoPath from '../mixins/VideoPath'
+import ThumbnailerProgress from './ThumbnailerProgress'
 
 export default {
   mixins: [VideoPath],
@@ -70,6 +72,9 @@ export default {
       const json = await response.json()
       console.log(json)
     }
+  },
+  components: {
+    ThumbnailerProgress
   }
 }
 </script>

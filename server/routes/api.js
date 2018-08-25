@@ -42,7 +42,7 @@ router.get('/video/file/*', async function(req, res) {
     .audioBitrate(128)
     .outputOptions(['-movflags frag_keyframe+empty_moov'])
     .on('end', () => console.log('Converted succesfully'))
-    .on('stderr', stderr => console.log('    ffmpeg:', stderr))
+    // .on('stderr', stderr => console.log('    ffmpeg:', stderr))
     .on('error', err => console.log('Error:', err.message))
     .pipe(res, { end: true })
 })
@@ -59,16 +59,6 @@ router.get('/dir/create-thumbnails/*', async function(req, res) {
     ThumbnailerQueue.addJob(video.relativePath)
   }
   res.json({})
-})
-
-router.get('/thumbnails/progress', async (req, res) => {
-  const queuedCount = await ThumbnailerQueue.getQueuedCount()
-  const activeJob = await ThumbnailerQueue.getActiveJob()
-  res.json({
-    queuedCount: queuedCount,
-    title: activeJob ? activeJob.data.title : null,
-    progress: activeJob ? activeJob._progress : null,
-  })
 })
 
 module.exports = router

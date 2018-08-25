@@ -15,6 +15,7 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
       button(@click="onCreateThumbnailsButtonClick")
         | Create Thumbnails
     scene-list
+  thumbnailer-progress
 </template>
 
 <script>
@@ -22,6 +23,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VideoPlayer from './VideoPlayer'
 import SceneList from './SceneList'
+import ThumbnailerProgress from './ThumbnailerProgress'
 import VideoPath from '../mixins/VideoPath'
 import { ViewMode } from '../enum.js'
 
@@ -87,6 +89,7 @@ export default {
   components: {
     VideoPlayer,
     SceneList,
+    ThumbnailerProgress,
   },
 }
 </script>
@@ -105,7 +108,7 @@ export default {
 
 nav
   position fixed
-  z-index 2
+  z-index 3
   padding 16px 0
   font-size 20px
 
@@ -126,7 +129,7 @@ nav
   transition-duration 1.2s
   transition-timing-function ease
   position fixed
-  z-index 1
+  z-index 2
   min-width 400px
   min-height 225px
   width 100%

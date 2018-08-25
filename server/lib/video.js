@@ -92,7 +92,7 @@ module.exports = class Video extends EventEmitter {
     for (let time = 0; time < duration; time += config.sceneInterval) {
       console.log(`Create thumbnail (${time}/${duration}) ${this.basename()}`)
       await this.createThumbnailAt(time)
-      this.emit('progress', time, duration)
+      this.emit('thumbnail-progress', time, duration)
     }
     await this.createSpriteImage()
   }

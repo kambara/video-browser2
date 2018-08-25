@@ -1,10 +1,12 @@
+const EventEmitter = require('events').EventEmitter
 const path = require('path')
 const kue = require('kue')
 const Video = require('./video')
 
 const queue = kue.createQueue()
+const emitter = new EventEmitter()
 
-module.exports = {
+const ThumbnailerQueue = {
   addJob(relativePath) {
     queue.create('thumbnail', {
       title: path.basename(relativePath),
@@ -15,38 +17,17 @@ module.exports = {
       }
     })
   },
-  getQueuedCount() {
-    return new Promise((resolve, reject) => {
-      queue.inactiveCount((err, total) => {
-        if (err) {
-          reject(err)
-        }
-        resolve(total)
-      })
-    })
+  onProgress(callback) {
+    emitter.on('progress', info => callback(info))
   },
-  getActiveJob() {
-    return new Promise((resolve, reject) => {
-      queue.active((err, ids) => {
-        if (err) {
-          reject(err)
-        }
-        if (ids && ids.length > 0) {
-          kue.Job.get(ids[0], (err, job) => {
-            resolve(job)
-          })
-        } else {
-          resolve(null)
-        }
-      })
-    })
-  }
+  onComplete(callback) {
+    emitter.on('complete', info => callback(info))
+  },
 }
 
 queue.process('thumbnail', async (job, done) => {
-  console.log('Process job:', job.data.title)
   const video = new Video(job.data.relativePath)
-  video.on('progress', (time, duration) => {
+  video.on('thumbnail-progress', (time, duration) => {
     job.progress(time, duration)
   })
   await video.createThumbnails()
@@ -57,12 +38,79 @@ queue.on('job enqueue', (id, type) => {
   console.log(`Job #${id} got queued of type ${type}`)
 })
 
-queue.on('job complete', (id) => {
+queue.on('job progress', async (id, progress) => {
+  const activeCount = await getActiveCount()
+  const inactiveCount = await getInactiveCount()
+  const completeCount = await getCompleteCount()
+  const failedCount = await getFailedCount()
+  const totalCount = activeCount + inactiveCount + completeCount + failedCount
   kue.Job.get(id, (err, job) => {
-    if (err) return
-    job.remove((err) => {
-      if (err) throw err
-      console.log(`Removed completed job #${job.id}`)
+    emitter.emit('progress', {
+      thumbnailerQueue: {
+        title: job.data.title,
+        progress: progress,
+        totalCount: totalCount,
+        completeCount: completeCount,
+        failedCount: failedCount,
+      },
+      mutation: 'SOCKET_THUMBNAILER_PROGRESS',
     })
   })
 })
+
+queue.on('job complete', async () => {
+  emitter.emit('complete', {
+    mutation: 'SOCKET_THUMBNAILER_COMPLETE'
+  })
+  const inactiveCount = await getInactiveCount()
+  if (inactiveCount == 0) {
+    removeCompletedJobs()
+  }
+})
+
+function removeCompletedJobs() {
+  queue.complete((err, ids) => {
+    ids.forEach((id) => {
+      kue.Job.get(id, (err, job) => {
+        job.remove((err) => {
+          if (err) throw err
+          console.log('Removed completed job:', job.data.title)
+        })
+      })
+    })
+  })
+}
+
+function getInactiveCount() {
+  return new Promise((resolve) => {
+    queue.inactiveCount((err, total) => {
+      resolve(total)
+    })
+  })
+}
+
+function getActiveCount() {
+  return new Promise((resolve) => {
+    queue.activeCount((err, total) => {
+      resolve(total)
+    })
+  })
+}
+
+function getCompleteCount() {
+  return new Promise((resolve) => {
+    queue.completeCount((err, total) => {
+      resolve(total)
+    })
+  })
+}
+
+function getFailedCount() {
+  return new Promise((resolve) => {
+    queue.failedCount((err, total) => {
+      resolve(total)
+    })
+  })
+}
+
+module.exports = ThumbnailerQueue
