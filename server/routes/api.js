@@ -7,8 +7,8 @@ const ThumbnailerQueue = require('../lib/thumbnailer-queue')
 
 router.get('/dir/list/*', async function(req, res) {
   const videoDir = new VideoDir(req.params[0])
-  const json = await videoDir.getEntriesJson()
-  res.json(json)
+  const list = await videoDir.getEntryInfoList()
+  res.json(list)
 })
 
 router.get('/video/info/*', async function(req, res) {

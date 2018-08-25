@@ -41,6 +41,15 @@ module.exports = class Video extends EventEmitter {
     })
   }
 
+  async getThumbnailsInfo() {
+    return {
+      allScenesImagePath: this.getAllScenesImagePublicPath(),
+      dirPath: this.getThumbnailsDirPublicPath(),
+      count: await this.getThumbnailsCount(),
+      sceneInterval: config.sceneInterval,
+    }
+  }
+
   //
   // AllScenesImage
   //
@@ -86,14 +95,15 @@ module.exports = class Video extends EventEmitter {
   // Create thumbnails
   //
   async createThumbnails() {
+    console.log('Create thumbnails:', this.basename())
     await fs.mkdirpAsync(this.getThumbnailsDirPath())
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
     for (let time = 0; time < duration; time += config.sceneInterval) {
-      console.log(`Create thumbnail (${time}/${duration}) ${this.basename()}`)
       await this.createThumbnailAt(time)
       this.emit('thumbnail-progress', time, duration)
     }
+    console.log('Creating sprite image')
     await this.createSpriteImage()
   }
 
@@ -152,14 +162,13 @@ module.exports = class Video extends EventEmitter {
           console.error('Cannot create thumbnails: ' + err.message)
           reject()
         })
-        // .on('stderr', stderr => console.log('    ffmpeg:', stderr))
+        //.on('stderr', stderr => console.log('    ffmpeg:', stderr))
         .save(this.getThumbnailImagePath(time))
     })
   }
 
   async createSpriteImage() {
     return new Promise(async resolve => {
-      console.log('Creating sprite image')
       const metadata = await this.getMetadata()
       const duration = Math.floor(metadata.format.duration)
       const imageCount = Math.ceil(duration / config.sceneInterval)

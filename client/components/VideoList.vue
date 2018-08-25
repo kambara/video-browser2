@@ -20,16 +20,16 @@ div
           .title
             i.fas.fa-folder
             | {{ basename(entry.path) }}
-          .scenes(v-if="entry.thumbnailsCount > 0")
-            img(v-for="(path, index) in representativeScenes(entry)"
+          .scenes(v-if="entry.thumbnails && entry.thumbnails.count > 0")
+            img(v-for="(path, index) in repScenes(entry.thumbnails)"
               :src="path")
-      div(v-if="entry.type == 'file'")
+      div(v-if="entry.type == 'video'")
         router-link(:to="linkToVideo(entry.path)")
           .title
             i.fas.fa-play-circle
             | {{ basename(entry.path) }}
-          .scenes(v-if="entry.thumbnailsCount > 0")
-            img(v-for="(path, index) in representativeScenes(entry)"
+          .scenes(v-if="entry.thumbnails.count > 0")
+            img(v-for="(path, index) in repScenes(entry.thumbnails)"
               :src="path")
   thumbnailer-progress
 </template>
@@ -60,26 +60,26 @@ export default {
       const response = await fetch(`/api/dir/list/${this.path}`)
       this.entries = await response.json()
     },
-    representativeScenes(entry) {
+    repScenes(thumbnails) {
       const results = []
-      const replInterval = entry.thumbnailsCount / (this.representativesCount + 1)
+      const replInterval = thumbnails.count / (this.representativesCount + 1)
       for (let i = 0; i < this.representativesCount; i++) {
         const index = Math.floor((i + 1) * replInterval)
-        const sec = index * entry.sceneInterval
-        const imagePath = `${entry.thumbnailsDirPath}/${sec}.jpg`
+        const sec = index * thumbnails.sceneInterval
+        const imagePath = `${thumbnails.dirPath}/${sec}.jpg`
         results.push(imagePath)
       }
       return results
     },
     async onCreateThumbnailsButtonClick() {
-      const response = await fetch(`/api/dir/thumbnails/create/${this.path}`)
-      const json = await response.json()
-      console.log(json)
+      const response = await fetch(
+        `/api/dir/thumbnails/create/${this.path}`)
+      await response.json()
     },
     async onRecursiveButtonClick() {
-      const response = await fetch(`/api/dir/thumbnails/create-recursive/${this.path}`)
-      const json = await response.json()
-      console.log(json)
+      const response = await fetch(
+        `/api/dir/thumbnails/create-recursive/${this.path}`)
+      await response.json()
     },
   },
   components: {
