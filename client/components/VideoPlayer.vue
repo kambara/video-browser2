@@ -1,9 +1,10 @@
 <template lang="pug">
 .video-container(@mousemove="onVideoMouseMove")
   video(
+    ref="video"
     type="video/mp4"
     :src="$store.getters.src"
-    :autoplay="isAutoPlay"
+    :autoplay="autoPlay"
     @canplay="onVideoCanPlay"
     @loadstart="onVideoLoadStart"
     @playing="onVideoPause"
@@ -36,9 +37,9 @@
             | /
             | {{ formatTime($store.state.video.duration) }}
         .right
-          button(@click.stop="toggleViewMode" v-if="!isFullscreen")
+          button(@click.stop="onViewModeButtonClick" v-if="!isFullscreen")
             i.fas.fa-lg.fa-th
-          button(@click.stop="toggleFullscreen")
+          button(@click.stop="onFullscreenButtonClick")
             i.fas.fa-lg(:class="fullscreenButtonClass")
 </template>
 
@@ -55,11 +56,10 @@ export default {
   mixins: [VideoUtil],
   data() {
     return {
-      isAutoPlay: true,
+      autoPlay: true,
       loaded: false,
       paused: true,
       seeking: false,
-      videoElement: null,
       currentTime: 0,
       lastTime: Date.now(),
       isControlVisible: true,
@@ -86,7 +86,7 @@ export default {
     },
   },
   watch: {
-    '$store.state.video.startTime' () {
+    '$store.state.video.startTime': function() {
       console.log(`VideoPlayer: Update currentTime: ${Math.floor(this.$store.state.video.startTime / 1000)} sec`)
       this.currentTime = this.$store.state.video.startTime
     }
@@ -108,23 +108,22 @@ export default {
     window.removeEventListener('keydown', this.onKeydown)
     clearInterval(this.intervalIdOfUpdateTime)
     this.pause()
-    if (this.videoElement) {
-      this.videoElement.removeAttribute('src')
-      this.videoElement.load()
+    if (this.$refs.video) {
+      this.$refs.video.removeAttribute('src')
+      this.$refs.video.load()
     }
   },
   methods: {
     play() {
       this.paused = false
-      if (this.videoElement) {
-        this.updateTime()
-        this.videoElement.play()
+      if (this.$refs.video) {
+        this.$refs.video.play()
       }
     },
     pause() {
       this.paused = true
-      if (this.videoElement) {
-        this.videoElement.pause()
+      if (this.$refs.video) {
+        this.$refs.video.pause()
       }
     },
     togglePaused() {
@@ -135,19 +134,16 @@ export default {
       }
     },
     updateTime() {
-      if (this.videoElement && !this.videoElement.paused) {
+      if (this.$refs.video && !this.$refs.video.paused) {
         this.currentTime += Date.now() - this.lastTime
       }
       this.lastTime = Date.now()
     },
     updateVideoVolume() {
-      if (this.videoElement) {
+      if (this.$refs.video) {
         const vol = this.volume * this.volume
-        this.videoElement.volume = vol
+        this.$refs.video.volume = vol
       }
-    },
-    toggleViewMode() {
-      this.$store.dispatch('toggleViewMode')
     },
     //
     // Video Event
@@ -155,17 +151,14 @@ export default {
     onVideoLoadStart() {
       this.loaded = false
     },
-    onVideoCanPlay(event) {
-      if (!this.videoElement) {
-        this.videoElement = event.target
-        this.updateVideoVolume()
-      }
+    onVideoCanPlay() {
+      this.updateVideoVolume()
       this.loaded = true
     },
-    onVideoPause() {
+    onVideoPause(event) {
       this.paused = event.target.paused
     },
-    onVideoPlaying() {
+    onVideoPlaying(event) {
       this.paused = event.target.paused
     },
     onVideoEnded () {
@@ -198,7 +191,7 @@ export default {
       if (!this.seeking) {
         this.seeking = true
         if (this.loaded) {
-          this.isAutoPlay = !this.paused
+          this.autoPlay = !this.paused
         }
         this.pause()
       }
@@ -213,12 +206,9 @@ export default {
     //
     // Play Button Event
     //
-    onPlayButtonClick () {
-      if (this.paused) {
-        this.play()
-      } else {
-        this.pause()
-      }
+    onPlayButtonClick (event) {
+      this.togglePaused()
+      event.currentTarget.blur()
     },
     //
     // Volume Event
@@ -229,8 +219,12 @@ export default {
       this.$cookies.set('volume', this.volume, '1Y')
     },
     //
-    // Fullscreen Event
+    // Fullscreen
     //
+    onFullscreenButtonClick(event) {
+      this.toggleFullscreen()
+      event.currentTarget.blur()
+    },
     toggleFullscreen () {
       if (document.webkitFullscreenElement) {
         document.webkitExitFullscreen()
@@ -242,10 +236,16 @@ export default {
       }
     },
     //
+    // ViewMode
+    //
+    onViewModeButtonClick(event) {
+      this.$store.dispatch('toggleViewMode')
+      event.currentTarget.blur()
+    },
+    //
     // Keyboard Event
     //
     onKeydown(event) {
-      // console.log('Keydown', event.key)
       switch(event.key) {
       case ' ':
         if (!event.repeat) {
