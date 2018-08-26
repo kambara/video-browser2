@@ -32,7 +32,7 @@ export default {
   position fixed
   z-index 1
   bottom 8px
-  right 12px
+  left 8px
   width 200px
   padding 10px 16px
   background-color #3C3C3C
