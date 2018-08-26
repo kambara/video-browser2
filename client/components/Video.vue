@@ -6,10 +6,9 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
         i.fas.fa-arrow-left
   .video-player-container(
     :class="{ pip: isPictureInPicture }"
-    @click="onVideoPlayerContainerClick"
-    )
+    @click="onVideoPlayerContainerClick")
     video-player
-  .video-info-container
+  .video-info-container(ref="videoInfoContainer")
     .header
       h1 {{ basename(path) }}
       button(@click="onCreateThumbnailsButtonClick")
@@ -44,6 +43,13 @@ export default {
     isPictureInPicture() {
       return (this.$store.state.video.viewMode === ViewMode.SCENE_LIST)
     },
+  },
+  watch: {
+    '$store.state.video.viewMode': function() {
+      if (this.$store.state.video.viewMode === ViewMode.SCENE_LIST) {
+        this.$refs.videoInfoContainer.focus()
+      }
+    }
   },
   created() {
     this.$store.dispatch('initVideo', this.path)
