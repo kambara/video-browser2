@@ -95,7 +95,7 @@ nav
   display flex
   padding 48px 16px 16px 16px
   font-size 20px
-  background-color #222222
+  background-color #333333
 
   .back-button
     display inline-block
@@ -112,15 +112,15 @@ nav
       padding 0px
       height 32px
       line-height 32px
-      font-size 20px
+      font-size 18px
 
   .right
     button
-      margin-left 8px
-      padding 6px 14px
-      background-color #333
+      height 32px
+      padding 0 16px
+      line-height 32px
+      background-color rgba(0, 0, 0, 0)
       border none
-      border-radius 3px
       color rgba(255, 255, 255, 0.5)
       font-size 12px
       cursor pointer

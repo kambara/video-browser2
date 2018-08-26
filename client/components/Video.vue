@@ -89,7 +89,7 @@ export default {
     hideNavigationLater() {
       this.hideNavigationTimeoutId = setTimeout(() => {
         this.isNavigationVisible = false
-      }, 4 * 100 * 1000)
+      }, 4 * 1000)
     },
   },
   components: {

@@ -323,7 +323,7 @@ export default {
       box-sizing border-box
       margin 8px 0
       border-radius 3px
-      background-color rgba(255, 255, 255, 0.6)
+      background-color rgba(255, 255, 255, 0.5)
       outline 0
       cursor pointer
       filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
@@ -339,8 +339,7 @@ export default {
         cursor pointer
 
       &:active::-webkit-slider-thumb
-        background-color #34c6ff
-        box-shadow: 0 0 0 3px rgba(0, 0, 0, .6)
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, .6)
 
       &.seek-bar
         display block
