@@ -308,9 +308,8 @@ export default {
     position absolute
     bottom 0px
     width 100%
-    padding 16px 16px
+    padding 8px
     box-sizing border-box
-    // background-color rgba(0, 0, 0, 0.3)
 
     .bottom
       display flex
@@ -320,29 +319,33 @@ export default {
 
     input[type="range"]
       -webkit-appearance none
-      height 5px
+      height 1px
       box-sizing border-box
       margin 8px 0
       border-radius 3px
-      background-color rgba(255, 255, 255, 0.4)
+      background-color rgba(255, 255, 255, 0.6)
       outline 0
       cursor pointer
-      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
+      filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
 
       &::-webkit-slider-thumb
         -webkit-appearance none
         position relative
         display block
-        width 14px
-        height 14px
+        width 11px
+        height 11px
         border-radius 50%
         background-color white
         cursor pointer
 
+      &:active::-webkit-slider-thumb
+        background-color #34c6ff
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, .6)
+
       &.seek-bar
         display block
         width 100%
-        margin-bottom 16px
+        margin-bottom 8px
 
       &.volume
         display inline-block
@@ -351,26 +354,28 @@ export default {
         vertical-align middle
 
     button
+      display inline-block
       width 36px
       height 36px
       background-color rgba(0, 0, 0, 0)
       color white
       border none
-      border-radius 6px
       outline 0
       cursor pointer
-      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
+      filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
 
       &:hover
-        background-color rgba(0, 0, 0, 0.5)
+        background-color rgba(0, 0, 0, .6)
+        color #34c6ff
+        transition: .4s
 
       &[disabled]
-        opacity 0.4
+        opacity 0.9
 
       &.play-button
         width 56px
 
     .time
       font-size 12px
-      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
+      filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
 </style>

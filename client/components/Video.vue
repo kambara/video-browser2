@@ -4,13 +4,13 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
     nav(v-if="isNavigationVisible")
       router-link.back-button(:to="linkToParentList(path)")
         i.fas.fa-arrow-left
+      h1 {{ basename(path) }}
   .video-player-container(
     :class="{ pip: isPictureInPicture }"
     @click="onVideoPlayerContainerClick")
     video-player
   .video-info-container(ref="videoInfoContainer")
     .header
-      h1 {{ basename(path) }}
       button(@click="onCreateThumbnailsButtonClick")
         | Create Thumbnails
     scene-list
@@ -89,7 +89,7 @@ export default {
     hideNavigationLater() {
       this.hideNavigationTimeoutId = setTimeout(() => {
         this.isNavigationVisible = false
-      }, 4 * 1000)
+      }, 4 * 100 * 1000)
     },
   },
   components: {
@@ -115,20 +115,32 @@ export default {
 nav
   position fixed
   z-index 3
-  padding 16px 0
-  font-size 20px
+  margin-top 8px
+  filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
 
   .back-button
     display inline-block
-    width 32px
-    height 32px
+    width 36px
+    height 36px
     margin-left 8px
-    line-height 32px
+    margin-right 8px
+    line-height 36px
     text-align center
-    border-radius 6px
+    font-size 18px
 
     &:hover
-      background-color rgba(0, 0, 0, 0.5)
+      background-color rgba(0, 0, 0, 0.6)
+      transition: .4s
+
+  h1
+    display inline-block
+    margin 0
+    padding 0
+    height 36px
+    line-height 36px
+    font-size 14px
+    vertical-align top
+    font-weight normal
 
 .video-player-container
   transition-property width, height
@@ -152,11 +164,23 @@ nav
   overflow scroll
 
   .header
-    padding-top 225px
+    height 225px
+    padding 16px 16px 0 (400px + 16px)
+    box-sizing border-box
+    background-color #222222
+    text-align right
+    
+    button
+      margin-left 8px
+      padding 6px 14px
+      background-color #333
+      border none
+      border-radius 3px
+      color rgba(255, 255, 255, 0.5)
+      font-size 12px
+      cursor pointer
 
-    h1
-      padding 0
-      margin 16px
-      font-size 18px
-      font-weight normal
+      &:hover
+        background-color #444
+        color rgba(255, 255, 255, .9)
 </style>

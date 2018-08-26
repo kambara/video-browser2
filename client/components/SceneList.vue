@@ -1,13 +1,12 @@
 <template lang="pug">
-div
-  ul.thumbnails
-    li.thumbnail(
-      v-for="(time, index) in $store.getters.timestamps"
-      :key="index"
-      :data-time="time"
-      :style="thumbnailStyle(index)"
-      @click="onThumbnailClick"
-      ) {{ formatTime(time) }}
+ul.thumbnails
+  li.thumbnail(
+    v-for="(time, index) in $store.getters.timestamps"
+    :key="index"
+    :data-time="time"
+    :style="thumbnailStyle(index)"
+    @click="onThumbnailClick")
+    .time {{ formatTime(time) }}
 </template>
 
 <script>
@@ -44,11 +43,19 @@ ul
   padding 0
   margin 16px
 
-  & > li
+  li
     display inline-block
     width 160px
     height 90px
+    margin-bottom 8px
     vertical-align top
     overflow hidden
     cursor pointer
+    font-size 10px
+
+    .time
+      text-align right
+      margin-top 4px
+      margin-right 4px
+      color rgba(255, 255, 255, 0.9)
 </style>
