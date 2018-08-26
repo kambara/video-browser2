@@ -30,7 +30,9 @@ export default {
     onThumbnailClick: function(event) {
       const time = event.target.getAttribute('data-time')
       this.$store.dispatch('startVideoAt', parseInt(time) * 1000)
-      this.$store.dispatch('switchToPlayerMode')
+      setTimeout(() => {
+        this.$store.dispatch('switchToPlayerMode')
+      }, 400)
     }
   }
 }
