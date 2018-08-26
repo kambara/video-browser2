@@ -118,6 +118,7 @@ module.exports = class Video extends EventEmitter {
     }
     console.log('Creating sprite image')
     await this.createSpriteImage()
+    console.log('Finish: ', this.getSpriteImagePath())
   }
 
   async existThumbnails() {
@@ -198,7 +199,6 @@ module.exports = class Video extends EventEmitter {
         }
         baseImage.quality(90)
         baseImage.write(this.getSpriteImagePath())
-        console.log('Sprite image:', this.getSpriteImagePath())
         resolve()
       })
     })

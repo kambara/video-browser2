@@ -1,5 +1,4 @@
 const EventEmitter = require('events').EventEmitter
-const path = require('path')
 const kue = require('kue')
 const Video = require('./video')
 
@@ -7,15 +6,17 @@ const queue = kue.createQueue()
 const emitter = new EventEmitter()
 
 const ThumbnailerQueue = {
-  addJob(relativePath) {
+  async addJob(video) {
+    if (await video.existThumbnails()) {
+      return false
+    }
     queue.create('thumbnail', {
-      title: path.basename(relativePath),
-      relativePath: relativePath
+      title: video.basename(),
+      relativePath: video.relativePath
     }).save((err) => {
-      if (err) {
-        console.error('Unable to create new job:', relativePath, err)
-      }
+      if (err) throw err
     })
+    return true
   },
   onProgress(callback) {
     emitter.on('progress', info => callback(info))
@@ -36,16 +37,15 @@ queue.process('thumbnail', async (job, done) => {
   done()
 })
 
-queue.on('job enqueue', (id, type) => {
-  console.log(`Job #${id} got queued of type ${type}`)
-})
-
 queue.on('job progress', async (id, progress) => {
   const activeCount = await getActiveCount()
   const inactiveCount = await getInactiveCount()
   const completeCount = await getCompleteCount()
   const failedCount = await getFailedCount()
-  const totalCount = activeCount + inactiveCount + completeCount + failedCount
+  const totalCount = activeCount
+    + inactiveCount
+    + completeCount
+    + failedCount
   kue.Job.get(id, (err, job) => {
     emitter.emit('progress', {
       thumbnailerQueue: {

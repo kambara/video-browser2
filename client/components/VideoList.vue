@@ -74,12 +74,14 @@ export default {
     async onCreateThumbnailsButtonClick() {
       const response = await fetch(
         `/api/dir/thumbnails/create/${this.path}`)
-      await response.json()
+      const json = await response.json()
+      console.log('Job count:', json.jobCount)
     },
     async onRecursiveButtonClick() {
       const response = await fetch(
         `/api/dir/thumbnails/create-recursive/${this.path}`)
-      await response.json()
+      const json = await response.json()
+      console.log('Job count:', json.jobCount)
     },
   },
   components: {
