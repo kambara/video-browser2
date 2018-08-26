@@ -105,7 +105,6 @@ const store = new Vuex.Store({
     },
     startVideoAt({ commit }, time) {
       commit('setVideoStartTime', time)
-      commit('setViewMode', ViewMode.PLAYER)
     },
     switchToPlayerMode({ commit }) {
       commit('setViewMode', ViewMode.PLAYER)

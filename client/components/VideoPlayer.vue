@@ -246,10 +246,19 @@ export default {
       // console.log('Keydown', event.key)
       switch(event.key) {
       case ' ':
-        this.togglePaused()
+        if (!event.repeat) {
+          this.togglePaused()
+        }
         break
       case 'f':
-        this.toggleFullscreen()
+        if (!event.repeat) {
+          this.toggleFullscreen()
+        }
+        break
+      case 'v':
+        if (!event.repeat) {
+          this.$store.dispatch('toggleViewMode')
+        }
         break
       case 'ArrowRight':
         console.log('---')
