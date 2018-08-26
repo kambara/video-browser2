@@ -14,9 +14,10 @@
       input.seek-bar(
         type="range"
         :value="currentTimeSec"
-        :max="$store.state.duration"
+        :max="$store.state.video.duration"
         @input="onSeekBarInput"
-        @change="onSeekBarChange")
+        @change="onSeekBarChange"
+        @click.stop)
       .bottom
         .left
           button.play-button(
@@ -28,12 +29,12 @@
             max="1"
             step="0.01"
             :value="volume"
-            @input.stop="onVolumeInput"
+            @input="onVolumeInput"
             @click.stop)
           span.time
             | {{ formatTime(currentTimeSec) }}
             | /
-            | {{ formatTime($store.state.duration) }}
+            | {{ formatTime($store.state.video.duration) }}
         .right
           button(@click.stop="toggleViewMode" v-if="!isFullscreen")
             i.fas.fa-lg.fa-th
@@ -85,9 +86,9 @@ export default {
     },
   },
   watch: {
-    '$store.state.videoStartTime' () {
-      console.log(`VideoPlayer: Update currentTime: ${Math.floor(this.$store.state.videoStartTime / 1000)} sec`)
-      this.currentTime = this.$store.state.videoStartTime
+    '$store.state.video.startTime' () {
+      console.log(`VideoPlayer: Update currentTime: ${Math.floor(this.$store.state.video.startTime / 1000)} sec`)
+      this.currentTime = this.$store.state.video.startTime
     }
   },
   created: async function() {
@@ -205,6 +206,7 @@ export default {
     },
     onSeekBarChange (event) {
       this.currentTime = event.target.value * 1000
+      console.log(`VideoPlayer: SeekbarChange: ${this.currentTime / 1000} sec ${Math.floor(this.currentTime/1000/60)} min`)
       this.$store.dispatch('startVideoAt', this.currentTime)
       this.seeking = false
     },

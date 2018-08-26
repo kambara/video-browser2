@@ -24,7 +24,7 @@ export default {
       const x = 160 * (index % 10)
       const y = 90 * Math.floor(index / 10)
       return `
-        background-image: url(${ this.$store.state.spriteImagePath });
+        background-image: url(${ this.$store.state.video.spriteImagePath });
         background-position: -${x}px -${y}px;`
     },
     onThumbnailClick: function(event) {

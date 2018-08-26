@@ -42,7 +42,7 @@ export default {
   },
   computed: {
     isPictureInPicture() {
-      return (this.$store.state.viewMode === ViewMode.SCENE_LIST)
+      return (this.$store.state.video.viewMode === ViewMode.SCENE_LIST)
     },
   },
   created() {
