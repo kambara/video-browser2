@@ -35,9 +35,6 @@ export default {
         return
       }
       this.$store.dispatch('startVideoAt', time)
-      setTimeout(() => {
-        this.$store.dispatch('switchToPlayerMode')
-      }, 400)
     }
   }
 }
