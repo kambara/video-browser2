@@ -5,7 +5,8 @@ ul.thumbnails
     :key="index"
     :data-time="time"
     :style="thumbnailStyle(index)"
-    @click="onThumbnailClick")
+    @click="onThumbnailClick"
+  )
     .time {{ formatTime(time) }}
 </template>
 

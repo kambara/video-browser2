@@ -3,7 +3,7 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
   transition(name="fade")
     nav(v-if="isNavigationVisible")
       router-link.back-button(:to="linkToParentList(path)")
-        i.fas.fa-arrow-left
+        i.material-icons arrow_back
       h1 {{ basename(path) }}
   .video-player-container(
     :class="{ pip: isPictureInPicture }"
@@ -89,7 +89,7 @@ export default {
     hideNavigationLater() {
       this.hideNavigationTimeoutId = setTimeout(() => {
         this.isNavigationVisible = false
-      }, 4 * 1000)
+      }, 4 * 100 * 1000)
     },
   },
   components: {
@@ -115,16 +115,14 @@ export default {
 nav
   position fixed
   z-index 3
-  margin-top 8px
-  filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
+  margin 8px
+  filter drop-shadow(0 0 1px rgba(0, 0, 0, .9))
 
   .back-button
     display inline-block
-    width 36px
-    height 36px
-    margin-left 8px
-    margin-right 8px
-    line-height 36px
+    width 48px
+    height 40px
+    line-height 40px
     text-align center
     font-size 18px
 
@@ -132,14 +130,18 @@ nav
       background-color rgba(0, 0, 0, 0.6)
       transition: .4s
 
+    i
+      vertical-align middle
+
   h1
     display inline-block
     margin 0
+    margin-left 8px
     padding 0
-    height 36px
-    line-height 36px
+    height 40px
+    line-height 40px
     font-size 14px
-    vertical-align top
+    letter-spacing 0.03em
     font-weight normal
 
 .video-player-container
@@ -183,4 +185,7 @@ nav
       &:hover
         background-color #444
         color rgba(255, 255, 255, .9)
+
+      i
+        vertical-align middle
 </style>

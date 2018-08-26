@@ -9,7 +9,8 @@
     @loadstart="onVideoLoadStart"
     @playing="onVideoPause"
     @pause="onVideoPause"
-    @ended="onVideoEnded")
+    @ended="onVideoEnded"
+  )
   transition(name="fade")
     .controls(v-if="isControlVisible")
       input.seek-bar(
@@ -18,29 +19,33 @@
         :max="$store.state.video.duration"
         @input="onSeekBarInput"
         @change="onSeekBarChange"
-        @click.stop)
+        @click.stop
+      )
       .bottom
         .left
           button.play-button(
             :disabled="!loaded"
-            @click.stop="onPlayButtonClick")
-            i.fas.fa-lg(:class="playButtonClass")
+            @click.stop="onPlayButtonClick"
+          )
+            i.material-icons {{ paused ? 'play_arrow' : 'pause' }}
           input.volume(
             type="range"
             max="1"
             step="0.01"
             :value="volume"
             @input="onVolumeInput"
-            @click.stop)
+            @click.stop
+          )
           span.time
             | {{ formatTime(currentTimeSec) }}
             | /
             | {{ formatTime($store.state.video.duration) }}
         .right
           button(@click.stop="onViewModeButtonClick" v-if="!isFullscreen")
-            i.fas.fa-lg.fa-th
+            i.material-icons view_comfy
           button(@click.stop="onFullscreenButtonClick")
-            i.fas.fa-lg(:class="fullscreenButtonClass")
+            i.material-icons
+              | {{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}
 </template>
 
 <script>
@@ -71,18 +76,6 @@ export default {
   computed: {
     currentTimeSec() {
       return Math.floor(this.currentTime / 1000)
-    },
-    playButtonClass() {
-      return {
-        'fa-play': this.paused,
-        'fa-pause': !this.paused
-      }
-    },
-    fullscreenButtonClass() {
-      return {
-        'fa-expand': !this.isFullscreen,
-        'fa-compress': this.isFullscreen
-      }
     },
   },
   watch: {
@@ -321,12 +314,11 @@ export default {
       -webkit-appearance none
       height 1px
       box-sizing border-box
-      margin 8px 0
       border-radius 3px
-      background-color rgba(255, 255, 255, 0.5)
+      background-color rgba(255, 255, 255, 0.6)
       outline 0
       cursor pointer
-      filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
+      filter drop-shadow(0 0px 1px rgba(0, 0, 0, .9))
 
       &::-webkit-slider-thumb
         -webkit-appearance none
@@ -344,37 +336,41 @@ export default {
       &.seek-bar
         display block
         width 100%
-        margin-bottom 8px
+        margin-bottom 12px
 
       &.volume
         display inline-block
         width 80px
-        margin 8px 10px
+        margin 0px 16px 0 8px
         vertical-align middle
 
     button
       display inline-block
-      width 36px
-      height 36px
+      width 48px
+      height 40px
       background-color rgba(0, 0, 0, 0)
-      color white
+      filter drop-shadow(0 0px 1px rgba(0, 0, 0, .9))
       border none
       outline 0
+      color white
+      vertical-align middle
       cursor pointer
-      filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
 
       &:hover
         background-color rgba(0, 0, 0, .6)
         color #34c6ff
-        transition: .4s
+        transition: .3s
 
       &[disabled]
         opacity 0.9
 
       &.play-button
-        width 56px
+        width 80px
 
     .time
       font-size 12px
-      filter drop-shadow(0 0px 1.8px rgba(0, 0, 0, .9))
+      font-weight 100
+      color rgba(255, 255, 255, 0.9)
+      filter drop-shadow(0 0px 1px rgba(0, 0, 0, .9))
+      cursor default
 </style>

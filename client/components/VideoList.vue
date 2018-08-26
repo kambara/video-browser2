@@ -4,8 +4,9 @@ div
     .left
       router-link.back-button(
         :to="linkToParentList(path)"
-        v-if="parent(path) != null")
-        i.fas.fa-arrow-left
+        v-if="parent(path) != null"
+      )
+        i.material-icons arrow_back
       h1(v-if="path") {{ basename(path) }}
       h1(v-else) VIDEO BROWSER
     .right
@@ -18,7 +19,7 @@ div
       div(v-if="entry.type == 'directory'")
         router-link(:to="linkToList(entry.path)")
           .title
-            i.fas.fa-folder
+            i.material-icons video_library
             | {{ basename(entry.path) }}
           .scenes(v-if="entry.thumbnails && entry.thumbnails.count > 0")
             img(v-for="(path, index) in repScenes(entry.thumbnails)"
@@ -26,7 +27,7 @@ div
       div(v-if="entry.type == 'video'")
         router-link(:to="linkToVideo(entry.path)")
           .title
-            i.fas.fa-play-circle
+            i.material-icons play_circle_filled
             | {{ basename(entry.path) }}
           .scenes(v-if="entry.thumbnails.count > 0")
             img(v-for="(path, index) in repScenes(entry.thumbnails)"
@@ -97,24 +98,32 @@ nav
   font-size 20px
   background-color #333333
 
-  .back-button
-    display inline-block
-    height 32px
-    margin-right 24px
-    line-height 32px
-
   .left
-    margin-right auto
+    flex 1
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+
+    .back-button
+      display inline-block
+      margin-right 16px
+
+      i
+        vertical-align middle
+        font-size 24px
 
     h1
       display inline-block
       margin 0px
       padding 0px
-      height 32px
-      line-height 32px
       font-size 18px
+      font-weight 100
+      vertical-align middle
 
   .right
+    width 240px
+    text-align right
+
     button
       height 32px
       padding 0 16px
@@ -145,9 +154,13 @@ ul
         margin 8px 0
         font-size 14px
         letter-spacing 0.03em
+        vertical-align middle
+        font-weight 100
 
         i
           margin-right 6px
+          vertical-align middle
+          font-size 24px
 
       .scenes
         height 90px
