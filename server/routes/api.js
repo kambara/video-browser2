@@ -5,23 +5,29 @@ const Video = require('../lib/video')
 const VideoDir = require('../lib/video-dir')
 const ThumbnailerQueue = require('../lib/thumbnailer-queue')
 
-router.get('/dir/list/*', async function(req, res) {
+//
+// List
+//
+router.get('/dir/list/*', async (req, res) => {
   const videoDir = new VideoDir(req.params[0])
-  const json = await videoDir.getEntriesJson()
-  res.json(json)
+  const list = await videoDir.getEntryInfoList()
+  res.json(list)
 })
 
-router.get('/video/info/*', async function(req, res) {
+//
+// Video
+//
+router.get('/video/info/*', async (req, res) => {
   const video = new Video(req.params[0])
   const metadata = await video.getMetadata()
   res.json({
     duration: metadata.format.duration,
-    allScenesImagePath: video.getAllScenesImagePublicPath(),
+    spriteImagePath: video.getSpriteImagePublicPath(),
     interval: 10
   })
 })
 
-router.get('/video/file/*', async function(req, res) {
+router.get('/video/file/*', async (req, res) => {
   const time = req.query.time ? parseInt(req.query.time) : 0
   const video = new Video(req.params[0])
   const metadata = await video.getMetadata()
@@ -47,27 +53,39 @@ router.get('/video/file/*', async function(req, res) {
     .pipe(res, { end: true })
 })
 
-router.get('/video/thumbnails/create/*', function(req, res) {
-  ThumbnailerQueue.addJob(req.params[0])
-  res.json({})
+//
+// Thumbnail creation
+//
+router.get('/video/thumbnails/create/*', async (req, res) => {
+  const video = new Video(req.params[0])
+  const isAdded = await ThumbnailerQueue.addJob(video)
+  res.json({
+    jobCount: isAdded ? 1 : 0
+  })
 })
 
-router.get('/dir/thumbnails/create/*', async function(req, res) {
+router.get('/dir/thumbnails/create/*', async (req, res) => {
   const videoDir = new VideoDir(req.params[0])
-  const videos = await videoDir.getVideos()
-  for (const video of videos) {
-    ThumbnailerQueue.addJob(video.relativePath)
+  let jobCount = 0
+  for (const video of await videoDir.getVideos()) {
+    const isAdded = await ThumbnailerQueue.addJob(video)
+    if (isAdded) jobCount++
   }
-  res.json({})
+  res.json({
+    jobCount: jobCount
+  })
 })
 
-router.get('/dir/thumbnails/create-recursive/*', async function(req, res) {
+router.get('/dir/thumbnails/create-recursive/*', async (req, res) => {
   const videoDir = new VideoDir(req.params[0])
-  const videos = await videoDir.getVideosRecursive()
-  for (const video of videos) {
-    ThumbnailerQueue.addJob(video.relativePath)
+  let jobCount = 0
+  for (const video of await videoDir.getVideosRecursive()) {
+    const isAdded = await ThumbnailerQueue.addJob(video)
+    if (isAdded) jobCount++
   }
-  res.json({})
+  res.json({
+    jobCount: jobCount
+  })
 })
 
 module.exports = router

@@ -46,15 +46,12 @@ module.exports = class VideoDir {
 
   async getEntries() {
     const entries = await fs.readdirAsync(this.getAbsolutePath())
-    return entries.filter(entry => {
-      // Exclude dotfiles
-      return !path.basename(entry).match(/^\./)
-    })
+    return entries.filter(entry => !path.basename(entry).match(/^\./))
   }
 
-  async getEntriesJson() {
+  async getEntryInfoList() {
     const entries = await this.getEntries()
-    const json = []
+    const entryList = []
     for (const entry of entries) {
       const entryRelativePath = path.join(this.relativePath, entry)
       const entryPath = path.join(this.getAbsolutePath(), entry)
@@ -64,46 +61,36 @@ module.exports = class VideoDir {
         const item = {
           type: 'directory',
           path: dir.relativePath,
-          allScenesImagePath: '',
-          thumbnailsDirPath: '',
-          thumbnailsCount: 0,
-          sceneInterval: config.sceneInterval
         }
-        const firstVideoRelPath = await dir.findFirstVideo()
-        if (firstVideoRelPath) {
-          const video = new Video(firstVideoRelPath)
-          item.allScenesImagePath = video.getAllScenesImagePublicPath()
-          item.thumbnailsDirPath = video.getThumbnailsDirPublicPath()
-          item.thumbnailsCount = await video.getThumbnailsCount()
+        const firstVideo = await dir.findFirstVideo()
+        if (firstVideo) {
+          item.thumbnails = await firstVideo.getThumbnailsInfo()
         }
-        json.push(item)
+        entryList.push(item)
       } else if (this.isVideo(entryRelativePath)) {
         const video = new Video(entryRelativePath)
-        json.push({
-          type: 'file',
+        const item = {
+          type: 'video',
           path: video.relativePath,
-          allScenesImagePath: video.getAllScenesImagePublicPath(),
-          thumbnailsDirPath: video.getThumbnailsDirPublicPath(),
-          thumbnailsCount: await video.getThumbnailsCount(),
-          sceneInterval: config.sceneInterval
-        })
+        }
+        item.thumbnails = await video.getThumbnailsInfo()
+        entryList.push(item)
       }
     }
-    return json
+    return entryList
   }
 
   async findFirstVideo() {
     // Find video file
-    const entries = await this.getEntries()
-    const videoFileName = entries.find(entry => this.isVideo(entry))
-    if (videoFileName) {
-      return path.join(this.relativePath, videoFileName)
+    const videos = await this.getVideos()
+    if (videos.length > 0) {
+      return videos[0]
     }
     // Find sub directories
     for (const videoDir of await this.getSubDirs()) {
-      const videoPath = await videoDir.findFirstVideo()
-      if (videoPath) {
-        return videoPath
+      const video = await videoDir.findFirstVideo()
+      if (video) {
+        return video
       }
     }
     return null

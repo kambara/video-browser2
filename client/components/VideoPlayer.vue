@@ -1,44 +1,51 @@
 <template lang="pug">
 .video-container(@mousemove="onVideoMouseMove")
   video(
+    ref="video"
     type="video/mp4"
     :src="$store.getters.src"
-    :autoplay="isAutoPlay"
+    :autoplay="autoPlay"
     @canplay="onVideoCanPlay"
     @loadstart="onVideoLoadStart"
     @playing="onVideoPause"
     @pause="onVideoPause"
-    @ended="onVideoEnded")
+    @ended="onVideoEnded"
+  )
   transition(name="fade")
     .controls(v-if="isControlVisible")
       input.seek-bar(
         type="range"
         :value="currentTimeSec"
-        :max="$store.state.duration"
+        :max="$store.state.video.duration"
         @input="onSeekBarInput"
-        @change="onSeekBarChange")
+        @change="onSeekBarChange"
+        @click.stop
+      )
       .bottom
         .left
           button.play-button(
             :disabled="!loaded"
-            @click.stop="onPlayButtonClick")
-            i.fas.fa-lg(:class="playButtonClass")
+            @click.stop="onPlayButtonClick"
+          )
+            i.material-icons {{ paused ? 'play_arrow' : 'pause' }}
           input.volume(
             type="range"
             max="1"
             step="0.01"
             :value="volume"
-            @input.stop="onVolumeInput"
-            @click.stop)
+            @input="onVolumeInput"
+            @click.stop
+          )
           span.time
             | {{ formatTime(currentTimeSec) }}
             | /
-            | {{ formatTime($store.state.duration) }}
+            | {{ formatTime($store.state.video.duration) }}
         .right
-          button(@click.stop="toggleViewMode" v-if="!isFullscreen")
-            i.fas.fa-lg.fa-th
-          button(@click.stop="toggleFullscreen")
-            i.fas.fa-lg(:class="fullscreenButtonClass")
+          button(@click.stop="onViewModeButtonClick" v-if="!isFullscreen")
+            i.material-icons view_comfy
+          button(@click.stop="onFullscreenButtonClick")
+            i.material-icons
+              | {{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}
 </template>
 
 <script>
@@ -54,11 +61,10 @@ export default {
   mixins: [VideoUtil],
   data() {
     return {
-      isAutoPlay: true,
+      autoPlay: true,
       loaded: false,
       paused: true,
       seeking: false,
-      videoElement: null,
       currentTime: 0,
       lastTime: Date.now(),
       isControlVisible: true,
@@ -71,26 +77,17 @@ export default {
     currentTimeSec() {
       return Math.floor(this.currentTime / 1000)
     },
-    playButtonClass() {
-      return {
-        'fa-play': this.paused,
-        'fa-pause': !this.paused
-      }
-    },
-    fullscreenButtonClass() {
-      return {
-        'fa-expand': !this.isFullscreen,
-        'fa-compress': this.isFullscreen
-      }
-    },
   },
   watch: {
-    '$store.state.videoStartTime' () {
-      this.currentTime = this.$store.state.videoStartTime
+    '$store.state.video.startTime': function() {
+      console.log(`VideoPlayer: Update currentTime: ${Math.floor(this.$store.state.video.startTime / 1000)} sec`)
+      this.currentTime = this.$store.state.video.startTime
     }
   },
   created: async function() {
-    setInterval(() => this.updateTime(), 100)
+    this.intervalIdOfUpdateTime = setInterval(() => {
+      this.updateTime()
+    }, 100)
     const vol = this.$cookies.get('volume')
     if (vol != null) {
       this.volume = vol
@@ -101,23 +98,23 @@ export default {
     window.addEventListener('keydown', this.onKeydown)
   },
   beforeDestroy() {
+    window.removeEventListener('keydown', this.onKeydown)
+    clearInterval(this.intervalIdOfUpdateTime)
     this.pause()
-    if (this.videoElement) {
-      this.videoElement.removeAttribute('src')
-      this.videoElement.load()
+    if (this.$refs.video) {
+      this.$refs.video.removeAttribute('src')
+      this.$refs.video.load()
     }
   },
   methods: {
     play() {
-      this.paused = false
-      if (this.videoElement) {
-        this.videoElement.play()
+      if (this.$refs.video) {
+        this.$refs.video.play()
       }
     },
     pause() {
-      this.paused = true
-      if (this.videoElement) {
-        this.videoElement.pause()
+      if (this.$refs.video) {
+        this.$refs.video.pause()
       }
     },
     togglePaused() {
@@ -128,19 +125,16 @@ export default {
       }
     },
     updateTime() {
-      if (this.videoElement && !this.videoElement.paused) {
+      if (this.$refs.video && !this.paused) {
         this.currentTime += Date.now() - this.lastTime
       }
       this.lastTime = Date.now()
     },
     updateVideoVolume() {
-      if (this.videoElement) {
+      if (this.$refs.video) {
         const vol = this.volume * this.volume
-        this.videoElement.volume = vol
+        this.$refs.video.volume = vol
       }
-    },
-    toggleViewMode() {
-      this.$store.dispatch('toggleViewMode')
     },
     //
     // Video Event
@@ -148,17 +142,14 @@ export default {
     onVideoLoadStart() {
       this.loaded = false
     },
-    onVideoCanPlay(event) {
-      if (!this.videoElement) {
-        this.videoElement = event.target
-        this.updateVideoVolume()
-      }
+    onVideoCanPlay() {
+      this.updateVideoVolume()
       this.loaded = true
     },
-    onVideoPause() {
+    onVideoPause(event) {
       this.paused = event.target.paused
     },
-    onVideoPlaying() {
+    onVideoPlaying(event) {
       this.paused = event.target.paused
     },
     onVideoEnded () {
@@ -191,7 +182,7 @@ export default {
       if (!this.seeking) {
         this.seeking = true
         if (this.loaded) {
-          this.isAutoPlay = !this.paused
+          this.autoPlay = !this.paused
         }
         this.pause()
       }
@@ -199,18 +190,16 @@ export default {
     },
     onSeekBarChange (event) {
       this.currentTime = event.target.value * 1000
+      console.log(`VideoPlayer: SeekbarChange: ${this.currentTime / 1000} sec ${Math.floor(this.currentTime/1000/60)} min`)
       this.$store.dispatch('startVideoAt', this.currentTime)
       this.seeking = false
     },
     //
     // Play Button Event
     //
-    onPlayButtonClick () {
-      if (this.paused) {
-        this.play()
-      } else {
-        this.pause()
-      }
+    onPlayButtonClick (event) {
+      this.togglePaused()
+      event.currentTarget.blur()
     },
     //
     // Volume Event
@@ -221,8 +210,12 @@ export default {
       this.$cookies.set('volume', this.volume, '1Y')
     },
     //
-    // Fullscreen Event
+    // Fullscreen
     //
+    onFullscreenButtonClick(event) {
+      this.toggleFullscreen()
+      event.currentTarget.blur()
+    },
     toggleFullscreen () {
       if (document.webkitFullscreenElement) {
         document.webkitExitFullscreen()
@@ -234,18 +227,35 @@ export default {
       }
     },
     //
+    // ViewMode
+    //
+    onViewModeButtonClick(event) {
+      this.$store.dispatch('toggleViewMode')
+      event.currentTarget.blur()
+    },
+    //
     // Keyboard Event
     //
     onKeydown(event) {
-      // console.log('Keydown', event.key)
       switch(event.key) {
       case ' ':
-        this.togglePaused()
+        if (!event.repeat) {
+          this.togglePaused()
+        }
         break
       case 'f':
-        this.toggleFullscreen()
+        if (!event.repeat) {
+          this.toggleFullscreen()
+        }
+        break
+      case 'v':
+        if (!event.repeat) {
+          this.$store.dispatch('toggleViewMode')
+        }
         break
       case 'ArrowRight':
+        console.log('---')
+        console.log(`VideoPlayer: ArrowRight: ${this.currentTime / 1000} sec ${Math.floor(this.currentTime/1000/60)} min`)
         this.$store.dispatch('startVideoAt', this.currentTime + 10 * 1000)
         this.showAndHideControlLater()
         break
@@ -262,7 +272,7 @@ export default {
         this.showAndHideControlLater()
         break
       }
-    }
+    },
   }
 }
 </script>
@@ -289,9 +299,8 @@ export default {
     position absolute
     bottom 0px
     width 100%
-    padding 16px 16px
+    padding 8px
     box-sizing border-box
-    // background-color rgba(0, 0, 0, 0.3)
 
     .bottom
       display flex
@@ -301,57 +310,65 @@ export default {
 
     input[type="range"]
       -webkit-appearance none
-      height 5px
+      height 1px
       box-sizing border-box
-      margin 8px 0
       border-radius 3px
-      background-color rgba(255, 255, 255, 0.4)
+      background-color rgba(255, 255, 255, 0.6)
       outline 0
       cursor pointer
-      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
+      filter drop-shadow(0 0px 1px rgba(0, 0, 0, .9))
 
       &::-webkit-slider-thumb
         -webkit-appearance none
         position relative
         display block
-        width 14px
-        height 14px
+        width 11px
+        height 11px
         border-radius 50%
         background-color white
         cursor pointer
 
+      &:active::-webkit-slider-thumb
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, .6)
+
       &.seek-bar
         display block
         width 100%
-        margin-bottom 16px
+        margin-bottom 12px
 
       &.volume
         display inline-block
         width 80px
-        margin 8px 10px
+        margin 0px 16px 0 8px
         vertical-align middle
 
     button
-      width 36px
-      height 36px
+      display inline-block
+      width 48px
+      height 40px
       background-color rgba(0, 0, 0, 0)
-      color white
+      filter drop-shadow(0 0px 1px rgba(0, 0, 0, .9))
       border none
-      border-radius 6px
       outline 0
+      color white
+      vertical-align middle
       cursor pointer
-      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
 
       &:hover
-        background-color rgba(0, 0, 0, 0.5)
+        background-color rgba(0, 0, 0, .6)
+        color #34c6ff
+        transition: .3s
 
       &[disabled]
-        opacity 0.4
+        opacity 0.9
 
       &.play-button
-        width 56px
+        width 80px
 
     .time
       font-size 12px
-      filter drop-shadow(0 1px 2px rgba(0, 0, 0, .5))
+      font-weight 100
+      color rgba(255, 255, 255, 0.9)
+      filter drop-shadow(0 0px 1px rgba(0, 0, 0, .9))
+      cursor default
 </style>

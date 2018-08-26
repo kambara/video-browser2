@@ -12,7 +12,7 @@ module.exports = class Video extends EventEmitter {
     this.relativePath = relativePath
     this.thumbnailWidth = 160
     this.thumbnailHeight = 90
-    this.allScenesImageColumns = 10
+    this.spriteImageColumns = 10
   }
 
   getVideoPath() {
@@ -41,39 +41,61 @@ module.exports = class Video extends EventEmitter {
     })
   }
 
+  async getThumbnailsInfo() {
+    return {
+      dirPath: this.getThumbnailsDirPublicPath(),
+      count: await this.getThumbnailsCount(),
+      sceneInterval: config.sceneInterval,
+    }
+  }
+
   //
-  // AllScenesImage
+  // Sprite Image
   //
-  getAllScenesImagePublicPath() {
-    return path.join('/thumbnails', this.getAllScenesImageFileName())
+  getSpriteImagePublicPath() {
+    return path.join(
+      '/thumbnails',
+      this.md5(),
+      this.getSpriteImageFileName())
   }
   
-  getAllScenesImagePath() {
+  getSpriteImagePath() {
     return path.join(
       __dirname,
-      '../data/thumbnails',
-      this.getAllScenesImageFileName())
+      '../data/thumbnails/',
+      this.md5(),
+      this.getSpriteImageFileName())
   }
 
-  getAllScenesImageFileName() {
-    return this.md5() + '.jpg'
+  getSpriteImageFileName() {
+    return `interval-${config.sceneInterval}.jpg`
   }
 
   //
-  // Thumbnail Images
+  // Thumbnail images
   //
   getThumbnailsDirPublicPath() {
-    return path.join('/thumbnails', this.md5())
+    return path.join(
+      '/thumbnails',
+      this.md5(),
+      `interval-${config.sceneInterval}`)
   }
 
   getThumbnailsDirPath() {
-    return path.join(__dirname, '../data/thumbnails', this.md5())
+    return path.join(
+      __dirname,
+      '../data/thumbnails',
+      this.md5(),
+      `interval-${config.sceneInterval}`)
   }
 
   getThumbnailImagePath(time) {
     return path.join(this.getThumbnailsDirPath(), time + '.jpg')
   }
 
+  //
+  // Thumbnails count
+  //
   async getThumbnailsCount() {
     if (! await fs.existsAsync(this.getThumbnailsDirPath()) ) {
       return 0
@@ -86,15 +108,17 @@ module.exports = class Video extends EventEmitter {
   // Create thumbnails
   //
   async createThumbnails() {
+    console.log('Creating thumbnails:', this.basename())
     await fs.mkdirpAsync(this.getThumbnailsDirPath())
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
     for (let time = 0; time < duration; time += config.sceneInterval) {
-      console.log(`Create thumbnail (${time}/${duration}) ${this.basename()}`)
       await this.createThumbnailAt(time)
       this.emit('thumbnail-progress', time, duration)
     }
+    console.log('Creating sprite image')
     await this.createSpriteImage()
+    console.log('Finish: ', this.getSpriteImagePath())
   }
 
   async existThumbnails() {
@@ -110,8 +134,8 @@ module.exports = class Video extends EventEmitter {
         return false
       }
     }
-    // Check allScenesImage
-    if (!await fs.existsAsync(this.getAllScenesImagePath())) {
+    // Check sprite image
+    if (!await fs.existsAsync(this.getSpriteImagePath())) {
       return false
     }
     return true
@@ -152,31 +176,29 @@ module.exports = class Video extends EventEmitter {
           console.error('Cannot create thumbnails: ' + err.message)
           reject()
         })
-        // .on('stderr', stderr => console.log('    ffmpeg:', stderr))
+        //.on('stderr', stderr => console.log('    ffmpeg:', stderr))
         .save(this.getThumbnailImagePath(time))
     })
   }
 
   async createSpriteImage() {
     return new Promise(async resolve => {
-      console.log('Creating sprite image')
       const metadata = await this.getMetadata()
       const duration = Math.floor(metadata.format.duration)
       const imageCount = Math.ceil(duration / config.sceneInterval)
-      const rows = Math.ceil(imageCount / this.allScenesImageColumns)
-      const baseWidth = this.thumbnailWidth * this.allScenesImageColumns
+      const rows = Math.ceil(imageCount / this.spriteImageColumns)
+      const baseWidth = this.thumbnailWidth * this.spriteImageColumns
       const baseHeight = this.thumbnailHeight * rows
       new Jimp(baseWidth, baseHeight, async (err, baseImage) => {
         for (let index = 0; index < imageCount; index++) {
           const imagePath = this.getThumbnailImagePath(index * config.sceneInterval)
           const image = await Jimp.read(imagePath)
-          const x = 160 * (index % this.allScenesImageColumns)
-          const y = 90 * Math.floor(index / this.allScenesImageColumns)
+          const x = 160 * (index % this.spriteImageColumns)
+          const y = 90 * Math.floor(index / this.spriteImageColumns)
           baseImage.blit(image, x, y)
         }
         baseImage.quality(90)
-        baseImage.write(this.getAllScenesImagePath())
-        console.log('Sprite image:', this.getAllScenesImagePath())
+        baseImage.write(this.getSpriteImagePath())
         resolve()
       })
     })

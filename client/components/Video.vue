@@ -3,15 +3,15 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
   transition(name="fade")
     nav(v-if="isNavigationVisible")
       router-link.back-button(:to="linkToParentList(path)")
-        i.fas.fa-arrow-left
+        i.material-icons arrow_back
+      h1 {{ basename(path) }}
   .video-player-container(
     :class="{ pip: isPictureInPicture }"
     @click="onVideoPlayerContainerClick"
-    )
+  )
     video-player
-  .video-info-container
+  .video-info-container(ref="videoInfoContainer")
     .header
-      h1 {{ basename(path) }}
       button(@click="onCreateThumbnailsButtonClick")
         | Create Thumbnails
     scene-list
@@ -42,8 +42,15 @@ export default {
   },
   computed: {
     isPictureInPicture() {
-      return (this.$store.state.viewMode === ViewMode.SCENE_LIST)
+      return (this.$store.state.video.viewMode === ViewMode.SCENE_LIST)
     },
+  },
+  watch: {
+    '$store.state.video.viewMode': function() {
+      if (this.$store.state.video.viewMode === ViewMode.SCENE_LIST) {
+        this.$refs.videoInfoContainer.focus()
+      }
+    }
   },
   created() {
     this.$store.dispatch('initVideo', this.path)
@@ -83,7 +90,7 @@ export default {
     hideNavigationLater() {
       this.hideNavigationTimeoutId = setTimeout(() => {
         this.isNavigationVisible = false
-      }, 4 * 1000)
+      }, 4 * 100 * 1000)
     },
   },
   components: {
@@ -101,39 +108,49 @@ export default {
 .fade-enter, .fade-leave-to
   opacity 0
 
-.pip
-  transition width,height .5s
-  width 0%
-  height 0%
-
 nav
   position fixed
   z-index 3
-  padding 16px 0
-  font-size 20px
+  margin 8px
+  filter drop-shadow(0 0 1px rgba(0, 0, 0, .9))
 
   .back-button
     display inline-block
-    width 32px
-    height 32px
-    margin-left 8px
-    line-height 32px
+    width 48px
+    height 40px
+    line-height 40px
     text-align center
-    border-radius 6px
+    font-size 18px
 
     &:hover
-      background-color rgba(0, 0, 0, 0.5)
+      background-color rgba(0, 0, 0, 0.6)
+      transition: .4s
+
+    i
+      vertical-align middle
+
+  h1
+    display inline-block
+    margin 0
+    margin-left 8px
+    padding 0
+    height 40px
+    line-height 40px
+    font-size 14px
+    letter-spacing 0.03em
+    font-weight normal
 
 .video-player-container
-  transition-property width, height
+  transition-property all
   transition-duration 1.2s
-  transition-timing-function ease
   position fixed
   z-index 2
   min-width 400px
   min-height 225px
   width 100%
   height 100%
+  bottom 0px
+  right 0px
   box-shadow 0 5px 10px rgba(0, 0, 0, .6)
 
   &.pip
@@ -146,11 +163,24 @@ nav
   overflow scroll
 
   .header
-    padding-top 225px
+    margin 16px
+    box-sizing border-box
+    text-align right
+    
+    button
+      height 32px
+      padding 0 16px
+      line-height 32px
+      background-color rgba(0, 0, 0, 0)
+      border none
+      color rgba(255, 255, 255, 0.5)
+      font-size 12px
+      cursor pointer
 
-    h1
-      padding 0
-      margin 16px
-      font-size 18px
-      font-weight normal
+      &:hover
+        background-color #333
+        color rgba(255, 255, 255, .9)
+
+      i
+        vertical-align middle
 </style>

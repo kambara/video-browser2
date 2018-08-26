@@ -4,8 +4,9 @@ div
     .left
       router-link.back-button(
         :to="linkToParentList(path)"
-        v-if="parent(path) != null")
-        i.fas.fa-arrow-left
+        v-if="parent(path) != null"
+      )
+        i.material-icons arrow_back
       h1(v-if="path") {{ basename(path) }}
       h1(v-else) VIDEO BROWSER
     .right
@@ -18,18 +19,18 @@ div
       div(v-if="entry.type == 'directory'")
         router-link(:to="linkToList(entry.path)")
           .title
-            i.fas.fa-folder
+            i.material-icons video_library
             | {{ basename(entry.path) }}
-          .scenes(v-if="entry.thumbnailsCount > 0")
-            img(v-for="(path, index) in representativeScenes(entry)"
+          .scenes(v-if="entry.thumbnails && entry.thumbnails.count > 0")
+            img(v-for="(path, index) in repScenes(entry.thumbnails)"
               :src="path")
-      div(v-if="entry.type == 'file'")
+      div(v-if="entry.type == 'video'")
         router-link(:to="linkToVideo(entry.path)")
           .title
-            i.fas.fa-play-circle
+            i.material-icons play_circle_filled
             | {{ basename(entry.path) }}
-          .scenes(v-if="entry.thumbnailsCount > 0")
-            img(v-for="(path, index) in representativeScenes(entry)"
+          .scenes(v-if="entry.thumbnails.count > 0")
+            img(v-for="(path, index) in repScenes(entry.thumbnails)"
               :src="path")
   thumbnailer-progress
 </template>
@@ -60,26 +61,28 @@ export default {
       const response = await fetch(`/api/dir/list/${this.path}`)
       this.entries = await response.json()
     },
-    representativeScenes(entry) {
+    repScenes(thumbnails) {
       const results = []
-      const replInterval = entry.thumbnailsCount / (this.representativesCount + 1)
+      const replInterval = thumbnails.count / (this.representativesCount + 1)
       for (let i = 0; i < this.representativesCount; i++) {
         const index = Math.floor((i + 1) * replInterval)
-        const sec = index * entry.sceneInterval
-        const imagePath = `${entry.thumbnailsDirPath}/${sec}.jpg`
+        const sec = index * thumbnails.sceneInterval
+        const imagePath = `${thumbnails.dirPath}/${sec}.jpg`
         results.push(imagePath)
       }
       return results
     },
     async onCreateThumbnailsButtonClick() {
-      const response = await fetch(`/api/dir/thumbnails/create/${this.path}`)
+      const response = await fetch(
+        `/api/dir/thumbnails/create/${this.path}`)
       const json = await response.json()
-      console.log(json)
+      console.log('Job count:', json.jobCount)
     },
     async onRecursiveButtonClick() {
-      const response = await fetch(`/api/dir/thumbnails/create-recursive/${this.path}`)
+      const response = await fetch(
+        `/api/dir/thumbnails/create-recursive/${this.path}`)
       const json = await response.json()
-      console.log(json)
+      console.log('Job count:', json.jobCount)
     },
   },
   components: {
@@ -93,32 +96,40 @@ nav
   display flex
   padding 48px 16px 16px 16px
   font-size 20px
-  background-color #222222
-
-  .back-button
-    display inline-block
-    height 32px
-    margin-right 24px
-    line-height 32px
+  background-color #333333
 
   .left
-    margin-right auto
+    flex 1
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+
+    .back-button
+      display inline-block
+      margin-right 16px
+
+      i
+        vertical-align middle
+        font-size 24px
 
     h1
       display inline-block
       margin 0px
       padding 0px
-      height 32px
-      line-height 32px
-      font-size 20px
+      font-size 18px
+      font-weight 100
+      vertical-align middle
 
   .right
+    width 240px
+    text-align right
+
     button
-      margin-left 8px
-      padding 6px 14px
-      background-color #333
+      height 32px
+      padding 0 16px
+      line-height 32px
+      background-color rgba(0, 0, 0, 0)
       border none
-      border-radius 3px
       color rgba(255, 255, 255, 0.5)
       font-size 12px
       cursor pointer
@@ -143,9 +154,13 @@ ul
         margin 8px 0
         font-size 14px
         letter-spacing 0.03em
+        vertical-align middle
+        font-weight 100
 
         i
           margin-right 6px
+          vertical-align middle
+          font-size 24px
 
       .scenes
         height 90px

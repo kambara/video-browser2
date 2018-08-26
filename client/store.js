@@ -6,12 +6,14 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    videoPath: null,
-    duration: 0,
-    allScenesImagePath: null,
-    sceneInterval: null,
-    videoStartTime: 0,
-    viewMode: ViewMode.PLAYER,
+    video: {
+      videoPath: null,
+      duration: 0,
+      startTime: 0,
+      spriteImagePath: null,
+      sceneInterval: null,
+      viewMode: ViewMode.PLAYER,
+    },
     socket: {
       isConnected: false,
       reconnectError: false,
@@ -26,37 +28,38 @@ const store = new Vuex.Store({
   },
   getters: {
     timestamps: state => {
-      if (!state.duration || !state.sceneInterval) {
+      if (!state.video.duration || !state.video.sceneInterval) {
         return []
       }
       const times = []
-      for (let time = 0; time <= state.duration; time += state.sceneInterval) {
+      for (let time = 0; time <= state.video.duration; time += state.video.sceneInterval) {
         times.push(time)
       }
       return times
     },
     src: state => {
-      if (!state.videoPath) {
+      if (!state.video.path) {
         return ''
       }
-      const sec = Math.floor(state.videoStartTime / 1000)
-      return `/api/video/file/${state.videoPath}?time=${sec}`
+      const sec = Math.floor(state.video.startTime / 1000)
+      return `/api/video/file/${state.video.path}?time=${sec}`
     }
   },
   mutations: {
     setVideoPath(state, path) {
-      state.videoPath = path
+      state.video.path = path
     },
     setVideoStartTime(state, time) {
-      state.videoStartTime = time
+      console.log(`Store: setVideoStartTime: ${Math.floor(time/1000)} sec ${Math.floor(time/1000/60)} min`)
+      state.video.startTime = time
     },
     setVideoInfo(state, info) {
-      state.duration = Math.floor(info.duration)
-      state.sceneInterval = info.interval
-      state.allScenesImagePath = info.allScenesImagePath
+      state.video.duration = Math.floor(info.duration)
+      state.video.sceneInterval = info.interval
+      state.video.spriteImagePath = info.spriteImagePath
     },
     setViewMode(state, viewMode) {
-      state.viewMode = viewMode
+      state.video.viewMode = viewMode
     },
     SOCKET_THUMBNAILER_PROGRESS(state, info) {
       state.thumbnailerQueue = info.thumbnailerQueue
@@ -92,19 +95,19 @@ const store = new Vuex.Store({
     initVideo({ commit, dispatch }, path) {
       commit('setVideoPath', path)
       commit('setVideoStartTime', 0)
+      commit('setViewMode', ViewMode.PLAYER)
       if (path && path.length > 0) {
         dispatch('loadVideoInfo')
       }
     },
     async loadVideoInfo({ commit, state }) {
-      const url = `/api/video/info/${state.videoPath}`
+      const url = `/api/video/info/${state.video.path}`
       const response = await fetch(url)
       const json = await response.json()
       commit('setVideoInfo', json)
     },
     startVideoAt({ commit }, time) {
       commit('setVideoStartTime', time)
-      commit('setViewMode', ViewMode.PLAYER)
     },
     switchToPlayerMode({ commit }) {
       commit('setViewMode', ViewMode.PLAYER)
@@ -113,7 +116,7 @@ const store = new Vuex.Store({
       commit('setViewMode', ViewMode.SCENE_LIST)
     },
     toggleViewMode({ commit, state }) {
-      if (state.viewMode === ViewMode.PLAYER) {
+      if (state.video.viewMode === ViewMode.PLAYER) {
         commit('setViewMode', ViewMode.SCENE_LIST)
       } else {
         commit('setViewMode', ViewMode.PLAYER)
