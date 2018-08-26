@@ -7,7 +7,8 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
       h1 {{ basename(path) }}
   .video-player-container(
     :class="{ pip: isPictureInPicture }"
-    @click="onVideoPlayerContainerClick")
+    @click="onVideoPlayerContainerClick"
+  )
     video-player
   .video-info-container(ref="videoInfoContainer")
     .header
@@ -107,11 +108,6 @@ export default {
 .fade-enter, .fade-leave-to
   opacity 0
 
-.pip
-  transition width,height .5s
-  width 0%
-  height 0%
-
 nav
   position fixed
   z-index 3
@@ -145,15 +141,16 @@ nav
     font-weight normal
 
 .video-player-container
-  transition-property width, height
+  transition-property all
   transition-duration 1.2s
-  transition-timing-function ease
   position fixed
   z-index 2
   min-width 400px
   min-height 225px
   width 100%
   height 100%
+  bottom 0px
+  right 0px
   box-shadow 0 5px 10px rgba(0, 0, 0, .6)
 
   &.pip
@@ -166,24 +163,22 @@ nav
   overflow scroll
 
   .header
-    height 225px
-    padding 16px 16px 0 (400px + 16px)
+    margin 16px
     box-sizing border-box
-    background-color #222222
     text-align right
     
     button
-      margin-left 8px
-      padding 6px 14px
-      background-color #333
+      height 32px
+      padding 0 16px
+      line-height 32px
+      background-color rgba(0, 0, 0, 0)
       border none
-      border-radius 3px
       color rgba(255, 255, 255, 0.5)
       font-size 12px
       cursor pointer
 
       &:hover
-        background-color #444
+        background-color #333
         color rgba(255, 255, 255, .9)
 
       i

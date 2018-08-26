@@ -108,13 +108,11 @@ export default {
   },
   methods: {
     play() {
-      this.paused = false
       if (this.$refs.video) {
         this.$refs.video.play()
       }
     },
     pause() {
-      this.paused = true
       if (this.$refs.video) {
         this.$refs.video.pause()
       }
@@ -127,7 +125,7 @@ export default {
       }
     },
     updateTime() {
-      if (this.$refs.video && !this.$refs.video.paused) {
+      if (this.$refs.video && !this.paused) {
         this.currentTime += Date.now() - this.lastTime
       }
       this.lastTime = Date.now()
