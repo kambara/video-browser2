@@ -28,8 +28,13 @@ export default {
         background-position: -${x}px -${y}px;`
     },
     onThumbnailClick: function(event) {
-      const time = event.target.getAttribute('data-time')
-      this.$store.dispatch('startVideoAt', parseInt(time) * 1000)
+      const dataTime = event.currentTarget.getAttribute('data-time')
+      const time = parseInt(dataTime) * 1000
+      if (isNaN(time)) {
+        console.error('time is NaN', dataTime)
+        return
+      }
+      this.$store.dispatch('startVideoAt', time)
       setTimeout(() => {
         this.$store.dispatch('switchToPlayerMode')
       }, 400)

@@ -7,7 +7,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     video: {
-      videoPath: null,
+      path: null,
       duration: 0,
       startTime: 0,
       spriteImagePath: null,
@@ -92,7 +92,7 @@ const store = new Vuex.Store({
     },
   },
   actions: {
-    initVideo({ commit, dispatch }, path) {
+    startVideo({ commit, dispatch }, path) {
       commit('setVideoPath', path)
       commit('setVideoStartTime', 0)
       commit('setViewMode', ViewMode.PLAYER)

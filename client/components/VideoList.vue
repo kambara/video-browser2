@@ -49,7 +49,7 @@ export default {
     }
   },
   watch: {
-    path () {
+    path() {
       this.updateEntries()
     }
   },

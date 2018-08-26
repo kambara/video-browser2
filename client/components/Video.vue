@@ -50,10 +50,10 @@ export default {
       if (this.$store.state.video.viewMode === ViewMode.SCENE_LIST) {
         this.$refs.videoInfoContainer.focus()
       }
-    }
+    },
   },
   created() {
-    this.$store.dispatch('initVideo', this.path)
+    this.$store.dispatch('startVideo', this.path)
     this.hideNavigationLater()
   },
   methods: {

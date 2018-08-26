@@ -147,10 +147,10 @@ export default {
       this.loaded = true
     },
     onVideoPause(event) {
-      this.paused = event.target.paused
+      this.paused = event.currentTarget.paused
     },
     onVideoPlaying(event) {
-      this.paused = event.target.paused
+      this.paused = event.currentTarget.paused
     },
     onVideoEnded () {
       this.pause()
@@ -186,10 +186,10 @@ export default {
         }
         this.pause()
       }
-      this.currentTime = event.target.value * 1000
+      this.currentTime = event.currentTarget.value * 1000
     },
     onSeekBarChange (event) {
-      this.currentTime = event.target.value * 1000
+      this.currentTime = event.currentTarget.value * 1000
       console.log(`VideoPlayer: SeekbarChange: ${this.currentTime / 1000} sec ${Math.floor(this.currentTime/1000/60)} min`)
       this.$store.dispatch('startVideoAt', this.currentTime)
       this.seeking = false
@@ -205,7 +205,7 @@ export default {
     // Volume Event
     //
     onVolumeInput (event) {
-      this.volume = event.target.value
+      this.volume = event.currentTarget.value
       this.updateVideoVolume()
       this.$cookies.set('volume', this.volume, '1Y')
     },
