@@ -1,5 +1,7 @@
 {
   "videoRoot": "/path/to/video/folder",
   "title": "VIDEO BROWSER",
-  "sceneInterval": 10
+  "sceneInterval": 10,
+  "httpPort": 3000,
+  "webSocketPort": 3001
 }

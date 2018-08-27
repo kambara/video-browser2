@@ -1,3 +1,4 @@
+const config = require('config')
 const express = require('express')
 const router = express.Router()
 const ffmpeg = require('fluent-ffmpeg')
@@ -85,6 +86,12 @@ router.get('/dir/thumbnails/create-recursive/*', async (req, res) => {
   }
   res.json({
     jobCount: jobCount
+  })
+})
+
+router.get('/websocket-port', (req, res) => {
+  res.json({
+    port: config.webSocketPort
   })
 })
 

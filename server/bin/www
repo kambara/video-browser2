@@ -3,9 +3,10 @@
 const app = require('../app')
 const debug = require('debug')('video-browser2:server')
 const http = require('http')
+const config = require('config')
 const wsApp = require('../websocket')
 
-const port = normalizePort(process.env.PORT || '3000')
+const port = normalizePort(process.env.PORT || config.httpPort)
 app.set('port', port)
 
 // App server
@@ -15,7 +16,7 @@ server.on('error', onError)
 server.on('listening', onListening)
 
 // WebSocket server
-wsApp.listen(3001)
+wsApp.listen(process.env.WS_PORT || config.webSocketPort)
 
 function normalizePort(val) {
   const port = parseInt(val, 10)

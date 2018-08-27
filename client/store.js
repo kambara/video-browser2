@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import VueNativeSock from 'vue-native-websocket'
 import { ViewMode } from './enum'
 
 Vue.use(Vuex)
@@ -124,5 +125,23 @@ const store = new Vuex.Store({
     },
   }
 })
+
+async function initWebSocket() {
+  const wsPort = await getWebSocketPort()
+  Vue.use(VueNativeSock, `ws://${location.hostname}:${wsPort}/`, {
+    store: store,
+    format: 'json',
+    reconnection: true,
+    reconnectionDelay: 10000,
+  })
+}
+
+async function getWebSocketPort() {
+  const response = await fetch('/api/websocket-port')
+  const json = await response.json()
+  return json.port
+}
+
+initWebSocket()
 
 export default store
