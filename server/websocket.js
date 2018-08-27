@@ -1,22 +1,27 @@
-const express = require('express')
+const WebSocket = require('ws')
+const debug = require('debug')('video-browser2:websocket')
 const ThumbnailerQueue = require('./lib/thumbnailer-queue')
 
-const app = express()
-const expressWs = require('express-ws')(app)
+const wss = new WebSocket.Server({ noServer: true })
 
-app.ws('/', () => {})
-
-// Broadcast thumbnail creation progress
-ThumbnailerQueue.onProgress((info) => {
-  expressWs.getWss('/').clients.forEach((client) => {
-    client.send(JSON.stringify(info))
-  })
+wss.on('connection', function connection() {
+  debug('connect')
 })
 
-ThumbnailerQueue.onComplete((info) => {
-  expressWs.getWss('/').clients.forEach((client) => {
-    client.send(JSON.stringify(info))
-  })
+ThumbnailerQueue.onProgress((json) => {
+  broadcast(json)
 })
 
-module.exports = app
+ThumbnailerQueue.onComplete((json) => {
+  broadcast(json)
+})
+
+function broadcast(json) {
+  wss.clients.forEach(function each(client) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(json))
+    }
+  })
+}
+
+module.exports = wss

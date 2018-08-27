@@ -1,4 +1,6 @@
 const createError = require('http-errors')
+const http = require('http')
+const url = require('url')
 const express = require('express')
 const path = require('path')
 const cookieParser = require('cookie-parser')
@@ -6,8 +8,11 @@ const logger = require('morgan')
 const stylus = require('stylus')
 const indexRouter = require('./routes/index')
 const apiRouter = require('./routes/api')
+const wss = require('./websocket')
 
+// Create app and server
 const app = express()
+const server = http.createServer(app)
 
 // Setup
 app.set('views', path.join(__dirname, 'views'))
@@ -24,6 +29,18 @@ app.use('/thumbnails', express.static(path.join(__dirname, 'data/thumbnails')))
 app.use('/api', apiRouter)
 app.use('/', indexRouter)
 
+// WebSocket
+server.on('upgrade', function upgrade(request, socket, head) {
+  const pathname = url.parse(request.url).pathname
+  if (pathname === '/ws/') {
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+      wss.emit('connection', ws, request)
+    })
+  } else {
+    socket.destroy()
+  }
+})
+
 // 404
 app.use((req, res, next) => {
   next(createError(404))
@@ -37,4 +54,5 @@ app.use((err, req, res) => {
   res.render('error')
 })
 
-module.exports = app
+// module.exports = app
+module.exports = {app, server}
