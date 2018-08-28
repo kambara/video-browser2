@@ -40,7 +40,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- ポート
 - 認証
 - 検索
 - ランダム表示
@@ -50,9 +49,12 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 - シーク直後にサムネイルをposter表示
 - シークバーサムネイル
 - タッチ操作
+- ダウンロード
 
 優先度低
 
 - 次の動画に進む
 - サムネイル進捗表示
 - キーフレーム抽出
+- 最近追加されたもの一覧
+- お気に入り

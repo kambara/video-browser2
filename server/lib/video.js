@@ -113,11 +113,11 @@ module.exports = class Video extends EventEmitter {
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
     for (let time = 0; time < duration; time += config.sceneInterval) {
-      await this.createThumbnailAt(time)
+      await this.createThumbnailAt(time).catch(err => { throw err })
       this.emit('thumbnail-progress', time, duration)
     }
     console.log('Creating sprite image')
-    await this.createSpriteImage()
+    await this.createSpriteImage().catch(err => { throw err })
     console.log('Finish: ', this.getSpriteImagePath())
   }
 
@@ -173,8 +173,7 @@ module.exports = class Video extends EventEmitter {
           resolve()
         })
         .on('error', (err) => {
-          console.error('Cannot create thumbnails: ' + err.message)
-          reject()
+          reject(err)
         })
         //.on('stderr', stderr => console.log('    ffmpeg:', stderr))
         .save(this.getThumbnailImagePath(time))
@@ -182,7 +181,7 @@ module.exports = class Video extends EventEmitter {
   }
 
   async createSpriteImage() {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       const metadata = await this.getMetadata()
       const duration = Math.floor(metadata.format.duration)
       const imageCount = Math.ceil(duration / config.sceneInterval)
@@ -190,12 +189,19 @@ module.exports = class Video extends EventEmitter {
       const baseWidth = this.thumbnailWidth * this.spriteImageColumns
       const baseHeight = this.thumbnailHeight * rows
       new Jimp(baseWidth, baseHeight, async (err, baseImage) => {
+        if (err) {
+          return reject(err)
+        }
         for (let index = 0; index < imageCount; index++) {
           const imagePath = this.getThumbnailImagePath(index * config.sceneInterval)
-          const image = await Jimp.read(imagePath)
-          const x = 160 * (index % this.spriteImageColumns)
-          const y = 90 * Math.floor(index / this.spriteImageColumns)
-          baseImage.blit(image, x, y)
+          try {
+            const image = await Jimp.read(imagePath)
+            const x = 160 * (index % this.spriteImageColumns)
+            const y = 90 * Math.floor(index / this.spriteImageColumns)
+            baseImage.blit(image, x, y)
+          } catch (err) {
+            return reject(err)
+          }
         }
         baseImage.quality(90)
         baseImage.write(this.getSpriteImagePath())

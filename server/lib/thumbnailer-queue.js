@@ -32,7 +32,12 @@ queue.process('thumbnail', async (job, done) => {
     video.on('thumbnail-progress', (time, duration) => {
       job.progress(time, duration)
     })
-    await video.createThumbnails()
+    try {
+      await video.createThumbnails()
+    } catch (err) {
+      console.error('Cannot create thumbnails:', err.message)
+      return done(err)
+    }
   }
   done()
 })
