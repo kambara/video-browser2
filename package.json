@@ -7,6 +7,7 @@
     "start": "node ./server/bin/www"
   },
   "dependencies": {
+    "basic-auth": "^2.0.0",
     "config": "^2.0.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
@@ -18,6 +19,8 @@
     "kue": "^0.11.6",
     "morgan": "~1.9.0",
     "pug": "^2.0.3",
+    "range_check": "^1.4.0",
+    "request-ip": "^2.1.1",
     "stylus": "0.54.5",
     "vue-cookies": "^1.5.6",
     "vue-native-websocket": "^2.0.8",

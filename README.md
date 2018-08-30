@@ -30,7 +30,7 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 #### Kue Dashboard
 
-    yarn run kue-dashboard -p 3002
+    yarn run kue-dashboard -p 3001
 
 ### Production mode
 
@@ -40,7 +40,10 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- 認証
+- Basic認証
+- IP認証
+- 設定ファイルにコメントを書けるようにする
+- /create-thumbnails はPOSTに
 - 検索
 - ランダム表示
 

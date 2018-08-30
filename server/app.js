@@ -6,6 +6,7 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const stylus = require('stylus')
+const basicAuth = require('./basic-auth-ipfilter')
 const indexRouter = require('./routes/index')
 const apiRouter = require('./routes/api')
 const wss = require('./websocket')
@@ -17,11 +18,7 @@ const server = http.createServer(app)
 // Setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'pug')
-// app.use(basicAuth({
-//   users: {
-//     kambara: 'hoge'
-//   }
-// }))
+app.use(basicAuth)
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
