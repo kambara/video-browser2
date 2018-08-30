@@ -65,6 +65,8 @@ typings/
 
 # config
 config/*.json
+config/*.yaml
+config/*.yml
 
 # thumbnails
 server/data/
