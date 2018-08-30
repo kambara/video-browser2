@@ -1,6 +1,7 @@
 const EventEmitter = require('events').EventEmitter
 const kue = require('kue')
 const Video = require('./video')
+const debug = require('debug')('video-browser2:thumbnailer')
 
 const queue = kue.createQueue()
 const emitter = new EventEmitter()
@@ -89,7 +90,7 @@ function removeJobs(ids) {
     kue.Job.get(id, (err, job) => {
       job.remove((err) => {
         if (err) throw err
-        console.log('Removed completed job:', job.data.title)
+        debug('Removed completed job:', job.data.title)
       })
     })
   })

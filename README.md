@@ -13,8 +13,8 @@
 
 ## Config
 
-    cp config/default.json.sample config/default.json
-    vi config/default.json
+    cp config/default.yaml.sample config/default.yaml
+    vi config/default.yaml
 
 ## Run
 
@@ -40,9 +40,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- Basic認証
-- IP認証
-- 設定ファイルにコメントを書けるようにする
 - /create-thumbnails はPOSTに
 - 検索
 - ランダム表示

@@ -5,6 +5,8 @@ const path = require('path')
 const config = require('config')
 const ffmpeg = require('fluent-ffmpeg')
 const Jimp = require('jimp')
+const debug = require('debug')('video-browser2:video')
+const debugFfmpeg = require('debug')('video-browser2:ffmpeg')
 
 module.exports = class Video extends EventEmitter {
   constructor(relativePath) {
@@ -108,7 +110,7 @@ module.exports = class Video extends EventEmitter {
   // Create thumbnails
   //
   async createThumbnails() {
-    console.log('Creating thumbnails:', this.basename())
+    debug('Creating thumbnails:', this.basename())
     await fs.mkdirpAsync(this.getThumbnailsDirPath())
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
@@ -116,9 +118,9 @@ module.exports = class Video extends EventEmitter {
       await this.createThumbnailAt(time).catch(err => { throw err })
       this.emit('thumbnail-progress', time, duration)
     }
-    console.log('Creating sprite image')
+    debug('Creating sprite image')
     await this.createSpriteImage().catch(err => { throw err })
-    console.log('Finish: ', this.getSpriteImagePath())
+    debug('Finish: ', this.getSpriteImagePath())
   }
 
   async existThumbnails() {
@@ -175,7 +177,7 @@ module.exports = class Video extends EventEmitter {
         .on('error', (err) => {
           reject(err)
         })
-        //.on('stderr', stderr => console.log('    ffmpeg:', stderr))
+        // .on('stderr', stderr => debugFfmpeg(stderr))
         .save(this.getThumbnailImagePath(time))
     })
   }

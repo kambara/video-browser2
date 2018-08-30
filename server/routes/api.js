@@ -2,6 +2,8 @@ const config = require('config')
 const express = require('express')
 const router = express.Router()
 const ffmpeg = require('fluent-ffmpeg')
+const debugFfmpeg = require('debug')('video-browser2:ffmpeg')
+const debug = require('debug')('video-browser2:api')
 const Video = require('../lib/video')
 const VideoDir = require('../lib/video-dir')
 const ThumbnailerQueue = require('../lib/thumbnailer-queue')
@@ -32,7 +34,7 @@ router.get('/video/file/*', async (req, res) => {
   const time = req.query.time ? parseInt(req.query.time) : 0
   const video = new Video(req.params[0])
   const metadata = await video.getMetadata()
-  // console.log(metadata)
+  // debug(metadata)
   const sourceCodecs = metadata.streams.reduce((obj, stream) => {
     obj[stream.codec_type] = stream.codec_name
     return obj
@@ -48,9 +50,9 @@ router.get('/video/file/*', async (req, res) => {
     .audioCodec(audioCodec)
     .audioBitrate(128)
     .outputOptions(['-movflags frag_keyframe+empty_moov'])
-    .on('end', () => console.log('Converted succesfully'))
-    // .on('stderr', stderr => console.log('    ffmpeg:', stderr))
-    .on('error', err => console.log('Error:', err.message))
+    .on('end', () => debug('Converted succesfully'))
+    .on('stderr', stderr => debugFfmpeg(stderr))
+    .on('error', err => debug(err.message))
     .pipe(res, { end: true })
 })
 
