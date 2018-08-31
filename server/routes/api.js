@@ -1,9 +1,8 @@
 const config = require('config')
 const express = require('express')
 const router = express.Router()
-const ffmpeg = require('fluent-ffmpeg')
-const debugFfmpeg = require('debug')('video-browser2:ffmpeg')
-const debug = require('debug')('video-browser2:api')
+// const ffmpeg = require('fluent-ffmpeg')
+// const debug = require('debug')('video-browser2:api')
 const Video = require('../lib/video')
 const VideoDir = require('../lib/video-dir')
 const ThumbnailerQueue = require('../lib/thumbnailer-queue')
@@ -31,29 +30,9 @@ router.get('/video/info/*', async (req, res) => {
 })
 
 router.get('/video/file/*', async (req, res) => {
-  const time = req.query.time ? parseInt(req.query.time) : 0
   const video = new Video(req.params[0])
-  const metadata = await video.getMetadata()
-  // debug(metadata)
-  const sourceCodecs = metadata.streams.reduce((obj, stream) => {
-    obj[stream.codec_type] = stream.codec_name
-    return obj
-  }, {})
-  const videoCodec = (sourceCodecs.video == 'h264') ? 'copy' : 'libx264'
-  const audioCodec = (sourceCodecs.audio.match(/mp3|aac/)) ? 'copy' : 'aac'
-  res.contentType('video/mp4')
-  ffmpeg(video.getVideoPath())
-    .seekInput(time)
-    .format('mp4')
-    .videoCodec(videoCodec)
-    .videoBitrate(3 * 1024)
-    .audioCodec(audioCodec)
-    .audioBitrate(128)
-    .outputOptions(['-movflags frag_keyframe+empty_moov'])
-    .on('end', () => debug('Converted succesfully'))
-    .on('stderr', stderr => debugFfmpeg(stderr))
-    .on('error', err => debug(err.message))
-    .pipe(res, { end: true })
+  const time = req.query.time ? parseInt(req.query.time) : 0
+  video.stream(res, time)
 })
 
 //

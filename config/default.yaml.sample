@@ -2,8 +2,8 @@ videoRoot: /path/to/video/folder
 title: VIDEO BROWSER
 sceneInterval: 10
 basicAuth:
-  name: "my-name"
-  password: "my-password"
+  name: my-name
+  password: my-password
   exempt:
     - "::1"
     - "127.0.0.1"

@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const EventEmitter = require('events')
 const fs = require('fs-extra-promise')
+const os = require('os')
 const path = require('path')
 const config = require('config')
 const ffmpeg = require('fluent-ffmpeg')
@@ -43,12 +44,70 @@ module.exports = class Video extends EventEmitter {
     })
   }
 
+  async getVideoCodec() {
+    const metadata = await this.getMetadata()
+    for (const stream of metadata.streams) {
+      if (stream.codec_type === 'video') {
+        return stream.codec_name
+      }
+    }
+    return null
+  }
+
+  async getAudioCodec() {
+    const metadata = await this.getMetadata()
+    for (const stream of metadata.streams) {
+      if (stream.codec_type === 'audio') {
+        return stream.codec_name
+      }
+    }
+    return null
+  }
+
   async getThumbnailsInfo() {
     return {
       dirPath: this.getThumbnailsDirPublicPath(),
       count: await this.getThumbnailsCount(),
       sceneInterval: config.sceneInterval,
     }
+  }
+
+  //
+  // stream
+  //
+  async stream(res, time = 0) {
+    const videoCodec = await this.getStreamVideoCodec()
+    const audioCodec = (await this.getAudioCodec() === 'aac') ? 'copy' : 'aac'
+    if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
+      console.log('vaapi')
+    }
+    res.contentType('video/mp4')
+    ffmpeg(this.getVideoPath())
+      .seekInput(time)
+      .format('mp4')
+      .videoCodec(videoCodec)
+      .videoBitrate(3 * 1024)
+      .audioCodec(audioCodec)
+      .audioBitrate(128)
+      .outputOptions(['-movflags frag_keyframe+empty_moov'])
+      .on('end', () => debug('Converted succesfully'))
+      .on('stderr', stderr => debugFfmpeg(stderr))
+      .on('error', err => debug(err.message))
+      .pipe(res, { end: true })
+  }
+
+  async getStreamVideoCodec() {
+    const sourceVideoCodec = await this.getVideoCodec()
+    if (sourceVideoCodec === 'h264') {
+      return 'copy'
+    }
+    if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
+      return 'h264_vaapi'
+    }
+    if (config.ffmpeg.videoToolboxEnabled && os.type() === 'Darwin') {
+      return 'h264_videotoolbox'
+    }
+    return 'libx264'
   }
 
   //
@@ -177,7 +236,7 @@ module.exports = class Video extends EventEmitter {
         .on('error', (err) => {
           reject(err)
         })
-        // .on('stderr', stderr => debugFfmpeg(stderr))
+        // .on('stderr', stderr => debug(stderr))
         .save(this.getThumbnailImagePath(time))
     })
   }
