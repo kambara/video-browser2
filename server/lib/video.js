@@ -80,12 +80,15 @@ module.exports = class Video extends EventEmitter {
     let streamVideoCodec = (await this.getVideoCodec() === 'h264') ? 'copy' : 'libx264'
     const inputOptions = []
     const videoFilters = []
-    if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
-      inputOptions.push('-vaapi_device /dev/dri/renderD128')
-      streamVideoCodec = 'h264_vaapi'
-      videoFilters.push('format=nv12,hwupload')
-    } else if (config.ffmpeg.videoToolboxEnabled && os.type() === 'Darwin') {
-      streamVideoCodec = 'h264_videotoolbox'
+    // Hardware Acceleration
+    if (streamVideoCodec !== 'copy') {
+      if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
+        streamVideoCodec = 'h264_vaapi'
+        inputOptions.push(`-vaapi_device ${config.ffmpeg.vaapiDevice}`)
+        videoFilters.push('format=nv12,hwupload')
+      } else if (config.ffmpeg.videoToolboxEnabled && os.type() === 'Darwin') {
+        streamVideoCodec = 'h264_videotoolbox'
+      }
     }
     res.contentType('video/mp4')
     ffmpeg(this.getVideoPath())
@@ -103,20 +106,6 @@ module.exports = class Video extends EventEmitter {
       .on('error', err => debug(err.message))
       .pipe(res, { end: true })
   }
-
-  // async getStreamVideoCodec() {
-  //   const sourceVideoCodec = await this.getVideoCodec()
-  //   if (sourceVideoCodec === 'h264') {
-  //     return 'copy'
-  //   }
-  //   if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
-  //     return 'h264_vaapi'
-  //   }
-  //   if (config.ffmpeg.videoToolboxEnabled && os.type() === 'Darwin') {
-  //     return 'h264_videotoolbox'
-  //   }
-  //   return 'libx264'
-  // }
 
   //
   // Sprite Image

@@ -8,3 +8,7 @@ basicAuth:
     - "::1"
     - "127.0.0.1"
     - "192.168.0.0/24"
+ffmpeg:
+  vaapiEnabled: false
+  vaapiDevice: /dev/dri/renderD128
+  videoToolboxEnabled: false
