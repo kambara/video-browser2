@@ -10,6 +10,8 @@ div
       h1(v-if="path") {{ basename(path) }}
       h1(v-else) VIDEO BROWSER
     .right
+      button(@click="onRandomButtonClick")
+        | Random
       button(@click="onCreateThumbnailsButtonClick")
         | Create Thumbnails
       button(@click="onRecursiveButtonClick")
@@ -41,20 +43,26 @@ import ThumbnailerProgress from './ThumbnailerProgress'
 
 export default {
   mixins: [VideoPath],
-  props: ['path'],
   data () {
     return {
       entries: [],
-      representativesCount: 6,
+    }
+  },
+  computed: {
+    path() {
+      return this.$route.params[0] || ''
     }
   },
   watch: {
-    path() {
+    '$route': function() {
       this.updateEntries()
     }
   },
   created: async function() {
     this.updateEntries()
+  },
+  mounted() {
+    window.addEventListener('keydown', this.onKeydown)
   },
   methods: {
     async updateEntries() {
@@ -62,9 +70,10 @@ export default {
       this.entries = await response.json()
     },
     repScenes(thumbnails) {
+      const representativesCount = 6
       const results = []
-      const replInterval = thumbnails.count / (this.representativesCount + 1)
-      for (let i = 0; i < this.representativesCount; i++) {
+      const replInterval = thumbnails.count / (representativesCount + 1)
+      for (let i = 0; i < representativesCount; i++) {
         const index = Math.floor((i + 1) * replInterval)
         const sec = index * thumbnails.sceneInterval
         const imagePath = `${thumbnails.dirPath}/${sec}.jpg`
@@ -72,17 +81,35 @@ export default {
       }
       return results
     },
+    //
+    // Button event
+    //
     async onCreateThumbnailsButtonClick() {
       const response = await fetch(
-        `/api/dir/thumbnails/create/${this.path}`)
+        `/api/dir/thumbnails/create/${this.path}`,
+        { method: 'POST' })
       const json = await response.json()
       console.log('Job count:', json.jobCount)
     },
     async onRecursiveButtonClick() {
       const response = await fetch(
-        `/api/dir/thumbnails/create-recursive/${this.path}`)
+        `/api/dir/thumbnails/create-recursive/${this.path}`,
+        { method: 'POST' })
       const json = await response.json()
       console.log('Job count:', json.jobCount)
+    },
+    onRandomButtonClick() {
+      this.$router.push('/random')
+    },
+    //
+    // Keyboard event
+    //
+    onKeydown(event) {
+      switch(event.key) {
+      case 'r':
+        this.$router.push('/random')
+        break
+      }
     },
   },
   components: {
@@ -121,7 +148,7 @@ nav
       vertical-align middle
 
   .right
-    width 240px
+    width 320px
     text-align right
 
     button

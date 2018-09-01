@@ -8,7 +8,6 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     video: {
-      path: null,
       duration: 0,
       startTime: 0,
       spriteImagePath: null,
@@ -38,20 +37,9 @@ const store = new Vuex.Store({
       }
       return times
     },
-    src: state => {
-      if (!state.video.path) {
-        return ''
-      }
-      const sec = Math.floor(state.video.startTime / 1000)
-      return `/api/video/file/${state.video.path}?time=${sec}`
-    }
   },
   mutations: {
-    setVideoPath(state, path) {
-      state.video.path = path
-    },
     setVideoStartTime(state, time) {
-      console.log(`Store: setVideoStartTime: ${Math.floor(time/1000)} sec ${Math.floor(time/1000/60)} min`)
       state.video.startTime = time
     },
     setVideoInfo(state, info) {
@@ -66,7 +54,6 @@ const store = new Vuex.Store({
       state.thumbnailerQueue = info.thumbnailerQueue
     },
     SOCKET_THUMBNAILER_COMPLETE(state) {
-      console.log('complete')
       state.thumbnailerQueue = {
         title: '',
         progress: 0,
@@ -93,19 +80,14 @@ const store = new Vuex.Store({
     },
   },
   actions: {
-    startVideo({ commit, dispatch }, path) {
-      commit('setVideoPath', path)
+    async initVideo({ commit }, path) {
       commit('setVideoStartTime', 0)
       commit('setViewMode', ViewMode.PLAYER)
       if (path && path.length > 0) {
-        dispatch('loadVideoInfo')
+        const response = await fetch(`/api/video/info/${path}`)
+        const json = await response.json()
+        commit('setVideoInfo', json)
       }
-    },
-    async loadVideoInfo({ commit, state }) {
-      const url = `/api/video/info/${state.video.path}`
-      const response = await fetch(url)
-      const json = await response.json()
-      commit('setVideoInfo', json)
     },
     startVideoAt({ commit }, time) {
       commit('setVideoStartTime', time)

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import store from './store'
 import VideoList from './components/VideoList'
 import Video from './components/Video'
+import Random from './components/Random'
 
 Vue.use(VueRouter)
 
@@ -12,17 +13,19 @@ const router = new VueRouter({
     {
       path: '/',
       component: VideoList,
-      props: { path: '' }
+      alias: '/list/'
     },
     {
       path: '/list/*',
       component: VideoList,
-      props: route => ({ path: route.params[0] })
     },
     {
       path: '/video/*',
       component: Video,
-      props: route => ({ path: route.params[0] })
+    },
+    {
+      path: '/random',
+      component: Random,
     }
   ]
 })
