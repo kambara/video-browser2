@@ -16,10 +16,7 @@ module.exports = class VideoDir {
     const entries = await this.getEntries()
     return entries
       .filter(entry => this.isVideo(entry))
-      .map(entry => {
-        const relPath = path.join(this.relativePath, entry)
-        return new Video(relPath)
-      })
+      .map(entry => new Video(path.join(this.relativePath, entry)))
   }
 
   async getSubDirs() {
@@ -28,8 +25,9 @@ module.exports = class VideoDir {
       const entryPath = path.join(this.getAbsolutePath(), entry)
       const stats = await fs.statAsync(entryPath)
       if (stats.isDirectory()) {
-        const relPath = path.join(this.relativePath, entry)
-        subDirs.push(new VideoDir(relPath))
+        subDirs.push(
+          new VideoDir(path.join(this.relativePath, entry))
+        )
       }
     }
     return subDirs
@@ -49,32 +47,27 @@ module.exports = class VideoDir {
     return entries.filter(entry => !path.basename(entry).match(/^\./))
   }
 
-  async getEntryInfoList() {
+  async getEntriesInfo() {
     const entries = await this.getEntries()
     const entryList = []
     for (const entry of entries) {
       const entryRelativePath = path.join(this.relativePath, entry)
-      const entryPath = path.join(this.getAbsolutePath(), entry)
-      const stat = await fs.statAsync(entryPath)
+      const stat = await fs.statAsync(path.join(this.getAbsolutePath(), entry))
       if (stat.isDirectory()) {
         const dir = new VideoDir(entryRelativePath)
-        const item = {
+        const firstVideo = await dir.findFirstVideo()
+        entryList.push({
           type: 'directory',
           path: dir.relativePath,
-        }
-        const firstVideo = await dir.findFirstVideo()
-        if (firstVideo) {
-          item.thumbnails = await firstVideo.getThumbnailsInfo()
-        }
-        entryList.push(item)
+          thumbnails: firstVideo ? await firstVideo.getThumbnailsInfo() : null
+        })
       } else if (this.isVideo(entryRelativePath)) {
         const video = new Video(entryRelativePath)
-        const item = {
+        entryList.push({
           type: 'video',
           path: video.relativePath,
-        }
-        item.thumbnails = await video.getThumbnailsInfo()
-        entryList.push(item)
+          thumbnails: await video.getThumbnailsInfo()
+        })
       }
     }
     return entryList

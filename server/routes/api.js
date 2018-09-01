@@ -10,7 +10,7 @@ const router = express.Router()
 //
 router.get('/dir/list/*', async (req, res) => {
   const videoDir = new VideoDir(req.params[0])
-  const list = await videoDir.getEntryInfoList()
+  const list = await videoDir.getEntriesInfo()
   res.json(list)
 })
 
