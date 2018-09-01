@@ -40,7 +40,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- /create-thumbnails はPOSTに
 - 検索
 - ランダム表示
 
