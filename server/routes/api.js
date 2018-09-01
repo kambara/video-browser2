@@ -34,6 +34,17 @@ router.get('/video/file/*', async (req, res) => {
 })
 
 //
+// Random
+//
+router.get('/random', async (req, res) => {
+  const videoDir = new VideoDir('')
+  const video = await videoDir.getRandomVideo()
+  res.json({
+    path: video.relativePath
+  })
+})
+
+//
 // Thumbnail creation
 //
 router.post('/video/thumbnails/create/*', async (req, res) => {

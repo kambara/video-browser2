@@ -1,6 +1,7 @@
 const fs = require('fs-extra-promise')
 const path = require('path')
 const config = require('config')
+const flatten = require('arr-flatten')
 const Video = require('./video')
 
 module.exports = class VideoDir {
@@ -87,6 +88,15 @@ module.exports = class VideoDir {
       }
     }
     return null
+  }
+
+  async getRandomVideo() {
+    const videos = flatten(await this.getVideosRecursive())
+    if (videos.length === 0) {
+      return null
+    }
+    const index = Math.floor(videos.length * Math.random())
+    return videos[index]
   }
 
   isVideo(entry) {

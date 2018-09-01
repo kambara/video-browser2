@@ -1,7 +1,7 @@
 <template lang="pug">
 div(@mousemove="onMouseMove" @wheel="onWheel")
   transition(name="fade")
-    nav(v-if="isNavigationVisible")
+    nav(v-if="navigationVisibility")
       router-link.back-button(:to="linkToParentList(path)")
         i.material-icons arrow_back
       h1 {{ basename(path) }}
@@ -12,6 +12,8 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
     video-player
   .video-info-container(ref="videoInfoContainer")
     .header
+      button(@click="onRandomButtonClick")
+        | Random
       button(@click="onCreateThumbnailsButtonClick")
         | Create Thumbnails
     scene-list
@@ -31,16 +33,15 @@ Vue.use(Vuex)
 
 export default {
   mixins: [VideoPath],
-  props: ['path'],
   data() {
     return {
-      isNavigationVisible: true,
-      hideNavigationTimeoutId: null,
-      wheelDistance: 0,
-      lastWheelTime: 0,
+      navigationVisibility: true
     }
   },
   computed: {
+    path() {
+      return this.$route.params[0] || ''
+    },
     isPictureInPicture() {
       return (this.$store.state.video.viewMode === ViewMode.SCENE_LIST)
     },
@@ -53,8 +54,11 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('startVideo', this.path)
+    this.$store.dispatch('initVideo', this.path)
+  },
+  mounted() {
     this.hideNavigationLater()
+    window.addEventListener('keydown', this.onKeydown)
   },
   methods: {
     async onCreateThumbnailsButtonClick () {
@@ -64,35 +68,62 @@ export default {
       const json = await response.json()
       console.log(json)
     },
+    //
+    // Button event
+    //
+    onRandomButtonClick() {
+      this.$router.push('/random')
+    },
+    onVideoPlayerContainerClick() {
+      this.$store.dispatch('switchToPlayerMode')
+    },
+    //
+    // Mouse event
+    //
     onMouseMove() {
       this.showNavigation()
       this.hideNavigationLater()
     },
+    showNavigation() {
+      if (this.timeoutIdOfHideNavigation) {
+        clearTimeout(this.timeoutIdOfHideNavigation)
+      }
+      this.navigationVisibility = true
+    },
+    hideNavigationLater() {
+      this.timeoutIdOfHideNavigation = setTimeout(() => {
+        this.navigationVisibility = false
+      }, 4 * 1000)
+    },
+    //
+    // Wheel event
+    //
     onWheel(event) {
+      if (!this.lastWheelTime) {
+        this.lastWheelTime = new Date().getTime()
+      }
+      if (!this.wheelDistance) {
+        this.wheelDistance = 0
+      }
       if (new Date().getTime() - this.lastWheelTime > 500) {
         this.wheelDistance = 0
       }
       this.wheelDistance += Math.abs(event.deltaY)
-      // console.log(this.wheelDistance)
       if (this.wheelDistance > 500) {
         this.$store.dispatch('switchToSceneListMode')
         this.wheelDistance = 0
       }
       this.lastWheelTime = new Date().getTime()
     },
-    onVideoPlayerContainerClick() {
-      this.$store.dispatch('switchToPlayerMode')
-    },
-    showNavigation() {
-      if (this.hideNavigationTimeoutId != null) {
-        clearTimeout(this.hideNavigationTimeoutId)
+    //
+    // Keyboard event
+    //
+    onKeydown(event) {
+      switch(event.key) {
+      case 'r':
+        this.$router.push('/random')
+        break
       }
-      this.isNavigationVisible = true
-    },
-    hideNavigationLater() {
-      this.hideNavigationTimeoutId = setTimeout(() => {
-        this.isNavigationVisible = false
-      }, 4 * 100 * 1000)
     },
   },
   components: {

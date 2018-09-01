@@ -3,16 +3,16 @@
   video(
     ref="video"
     type="video/mp4"
-    :src="$store.getters.src"
+    :src="src"
     :autoplay="autoPlay"
     @canplay="onVideoCanPlay"
     @loadstart="onVideoLoadStart"
-    @playing="onVideoPause"
+    @playing="onVideoPlaying"
     @pause="onVideoPause"
     @ended="onVideoEnded"
   )
   transition(name="fade")
-    .controls(v-if="isControlVisible")
+    .controls(v-if="controlVisibility")
       input.seek-bar(
         type="range"
         :value="currentTimeSec"
@@ -41,11 +41,11 @@
             | /
             | {{ formatTime($store.state.video.duration) }}
         .right
-          button(@click.stop="onViewModeButtonClick" v-if="!isFullscreen")
+          button(@click.stop="onViewModeButtonClick" v-if="!fullscreen")
             i.material-icons view_comfy
           button(@click.stop="onFullscreenButtonClick")
             i.material-icons
-              | {{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}
+              | {{ fullscreen ? 'fullscreen_exit' : 'fullscreen' }}
 </template>
 
 <script>
@@ -61,26 +61,40 @@ export default {
   mixins: [VideoUtil],
   data() {
     return {
+      loaded_: false,
+      paused_: true,
       autoPlay: true,
-      loaded: false,
-      paused: true,
-      seeking: false,
       currentTime: 0,
-      lastTime: Date.now(),
-      isControlVisible: true,
-      isFullscreen: false,
-      hideControlTimeoutId: null,
+      controlVisibility: true,
+      fullscreen: false,
       volume: 0.5,
     }
   },
   computed: {
+    loaded: function() {
+      return this.loaded_
+    },
+    paused() {
+      return this.paused_
+    },
+    src() {
+      const path = this.$route.params[0]
+      const sec = Math.floor(this.$store.state.video.startTime / 1000)
+      return `/api/video/file/${path}?time=${sec}`
+    },
     currentTimeSec() {
       return Math.floor(this.currentTime / 1000)
     },
   },
   watch: {
+    volume() {
+      if (this.$refs.video) {
+        const vol = this.volume * this.volume
+        this.$refs.video.volume = vol
+      }
+      this.$cookies.set('volume', this.volume, '1Y')
+    },
     '$store.state.video.startTime': function() {
-      console.log(`VideoPlayer: Update currentTime: ${Math.floor(this.$store.state.video.startTime / 1000)} sec`)
       this.currentTime = this.$store.state.video.startTime
     }
   },
@@ -92,9 +106,9 @@ export default {
     if (vol != null) {
       this.volume = vol
     }
-    this.hideControlLater()
   },
   mounted() {
+    this.hideControlLater()
     window.addEventListener('keydown', this.onKeydown)
   },
   beforeDestroy() {
@@ -117,7 +131,7 @@ export default {
         this.$refs.video.pause()
       }
     },
-    togglePaused() {
+    togglePlay() {
       if (this.paused) {
         this.play()
       } else {
@@ -125,32 +139,25 @@ export default {
       }
     },
     updateTime() {
-      if (this.$refs.video && !this.paused) {
+      if (this.$refs.video && !this.paused && this.lastTime) {
         this.currentTime += Date.now() - this.lastTime
       }
       this.lastTime = Date.now()
     },
-    updateVideoVolume() {
-      if (this.$refs.video) {
-        const vol = this.volume * this.volume
-        this.$refs.video.volume = vol
-      }
-    },
     //
-    // Video Event
+    // Video event
     //
     onVideoLoadStart() {
-      this.loaded = false
+      this.loaded_ = false
     },
     onVideoCanPlay() {
-      this.updateVideoVolume()
-      this.loaded = true
+      this.loaded_ = true
     },
     onVideoPause(event) {
-      this.paused = event.currentTarget.paused
+      this.paused_ = event.currentTarget.paused
     },
     onVideoPlaying(event) {
-      this.paused = event.currentTarget.paused
+      this.paused_ = event.currentTarget.paused
     },
     onVideoEnded () {
       this.pause()
@@ -159,14 +166,14 @@ export default {
       this.showAndHideControlLater()
     },
     showControl() {
-      this.isControlVisible = true
-      if (this.hideControlTimeoutId != null) {
-        clearTimeout(this.hideControlTimeoutId)
+      this.controlVisibility = true
+      if (this.timeoutIdOfHideControl) {
+        clearTimeout(this.timeoutIdOfHideControl)
       }
     },
     hideControlLater() {
-      this.hideControlTimeoutId = setTimeout(() => {
-        this.isControlVisible = false
+      this.timeoutIdOfHideControl = setTimeout(() => {
+        this.controlVisibility = false
       }, 4 * 1000)
     },
     showAndHideControlLater() {
@@ -176,7 +183,7 @@ export default {
       }
     },
     //
-    // Seek Bar Event
+    // Seek bar
     //
     onSeekBarInput (event) {
       if (!this.seeking) {
@@ -190,24 +197,21 @@ export default {
     },
     onSeekBarChange (event) {
       this.currentTime = event.currentTarget.value * 1000
-      console.log(`VideoPlayer: SeekbarChange: ${this.currentTime / 1000} sec ${Math.floor(this.currentTime/1000/60)} min`)
       this.$store.dispatch('startVideoAt', this.currentTime)
       this.seeking = false
     },
     //
-    // Play Button Event
+    // Play button
     //
     onPlayButtonClick (event) {
-      this.togglePaused()
+      this.togglePlay()
       event.currentTarget.blur()
     },
     //
-    // Volume Event
+    // Volume
     //
     onVolumeInput (event) {
       this.volume = event.currentTarget.value
-      this.updateVideoVolume()
-      this.$cookies.set('volume', this.volume, '1Y')
     },
     //
     // Fullscreen
@@ -219,11 +223,11 @@ export default {
     toggleFullscreen () {
       if (document.webkitFullscreenElement) {
         document.webkitExitFullscreen()
-        this.isFullscreen = false
+        this.fullscreen = false
       } else {
         document.querySelector('.video-container')
           .webkitRequestFullscreen()
-        this.isFullscreen = true
+        this.fullscreen = true
       }
     },
     //
@@ -234,13 +238,13 @@ export default {
       event.currentTarget.blur()
     },
     //
-    // Keyboard Event
+    // Keyboard event
     //
     onKeydown(event) {
       switch(event.key) {
       case ' ':
         if (!event.repeat) {
-          this.togglePaused()
+          this.togglePlay()
         }
         break
       case 'f':
@@ -254,8 +258,6 @@ export default {
         }
         break
       case 'ArrowRight':
-        console.log('---')
-        console.log(`VideoPlayer: ArrowRight: ${this.currentTime / 1000} sec ${Math.floor(this.currentTime/1000/60)} min`)
         this.$store.dispatch('startVideoAt', this.currentTime + 10 * 1000)
         this.showAndHideControlLater()
         break
@@ -360,7 +362,7 @@ export default {
         transition: .3s
 
       &[disabled]
-        opacity 0.9
+        opacity 0.5
 
       &.play-button
         width 80px
