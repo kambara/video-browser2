@@ -76,18 +76,26 @@ module.exports = class Video extends EventEmitter {
   // stream
   //
   async stream(res, time = 0) {
-    const videoCodec = await this.getStreamVideoCodec()
-    const audioCodec = (await this.getAudioCodec() === 'aac') ? 'copy' : 'aac'
+    const streamAudioCodec = (await this.getAudioCodec() === 'aac') ? 'copy' : 'aac'
+    let streamVideoCodec = (await this.getVideoCodec() === 'h264') ? 'copy' : 'libx264'
+    const inputOptions = []
+    const videoFilters = []
     if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
-      console.log('vaapi')
+      inputOptions.push('-vaapi_device /dev/dri/renderD128')
+      streamVideoCodec = 'h264_vaapi'
+      videoFilters.push('format=nv12,hwupload')
+    } else if (config.ffmpeg.videoToolboxEnabled && os.type() === 'Darwin') {
+      streamVideoCodec = 'h264_videotoolbox'
     }
     res.contentType('video/mp4')
     ffmpeg(this.getVideoPath())
       .seekInput(time)
+      .inputOptions(inputOptions)
       .format('mp4')
-      .videoCodec(videoCodec)
+      .videoCodec(streamVideoCodec)
       .videoBitrate(3 * 1024)
-      .audioCodec(audioCodec)
+      .videoFilters(videoFilters)
+      .audioCodec(streamAudioCodec)
       .audioBitrate(128)
       .outputOptions(['-movflags frag_keyframe+empty_moov'])
       .on('end', () => debug('Converted succesfully'))
@@ -96,19 +104,19 @@ module.exports = class Video extends EventEmitter {
       .pipe(res, { end: true })
   }
 
-  async getStreamVideoCodec() {
-    const sourceVideoCodec = await this.getVideoCodec()
-    if (sourceVideoCodec === 'h264') {
-      return 'copy'
-    }
-    if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
-      return 'h264_vaapi'
-    }
-    if (config.ffmpeg.videoToolboxEnabled && os.type() === 'Darwin') {
-      return 'h264_videotoolbox'
-    }
-    return 'libx264'
-  }
+  // async getStreamVideoCodec() {
+  //   const sourceVideoCodec = await this.getVideoCodec()
+  //   if (sourceVideoCodec === 'h264') {
+  //     return 'copy'
+  //   }
+  //   if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
+  //     return 'h264_vaapi'
+  //   }
+  //   if (config.ffmpeg.videoToolboxEnabled && os.type() === 'Darwin') {
+  //     return 'h264_videotoolbox'
+  //   }
+  //   return 'libx264'
+  // }
 
   //
   // Sprite Image

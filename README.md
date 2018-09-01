@@ -46,6 +46,7 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度中
 
+- VAAPI対応
 - シーク直後にサムネイルをposter表示
 - シークバーサムネイル
 - タッチ操作
