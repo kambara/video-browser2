@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import store from './store'
-import VideoList from './components/VideoList'
-import Video from './components/Video'
-import Random from './components/Random'
+import store from './stores/store'
+import VideoDirPage from './pages/VideoDirPage'
+import VideoPage from './pages/VideoPage'
+import RandomPage from './pages/RandomPage'
+import SearchPage from './pages/SearchPage'
 
 Vue.use(VueRouter)
 
@@ -12,20 +13,25 @@ const router = new VueRouter({
   routes: [
     {
       path: '/',
-      component: VideoList,
+      component: VideoDirPage,
       alias: '/list/'
     },
     {
       path: '/list/*',
-      component: VideoList,
+      component: VideoDirPage,
     },
     {
       path: '/video/*',
-      component: Video,
+      component: VideoPage,
     },
     {
       path: '/random',
-      component: Random,
+      component: RandomPage,
+    },
+    {
+      path: '/search/:query',
+      name: 'search',
+      component: SearchPage
     }
   ]
 })

@@ -1,8 +1,8 @@
 const express = require('express')
+const { map } = require('p-iteration')
 const Video = require('../lib/video')
 const VideoDir = require('../lib/video-dir')
 const ThumbnailerQueue = require('../lib/thumbnailer-queue')
-
 const router = express.Router()
 
 //
@@ -10,8 +10,17 @@ const router = express.Router()
 //
 router.get('/dir/list/*', async (req, res) => {
   const videoDir = new VideoDir(req.params[0])
-  const list = await videoDir.getEntriesInfo()
-  res.json(list)
+  const entries = await videoDir.getEntries()
+  res.json(await map(entries, entry => entry.toJson()))
+})
+
+//
+// Search
+//
+router.get('/search/:query', async (req, res) => {
+  const videoDir = new VideoDir('')
+  const entries = await videoDir.searchEntries(req.params.query)
+  res.json(await map(entries, entry => entry.toJson()))
 })
 
 //

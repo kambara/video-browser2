@@ -1,0 +1,71 @@
+nav
+  padding 16px 0 16px 16px
+  font-size 20px
+  background-color #333333
+
+  .top
+    display block
+    text-align right
+    margin-bottom 16px
+
+  .bottom
+    display flex
+
+    .left
+      flex-grow 1
+      white-space nowrap
+      overflow hidden
+      text-overflow ellipsis
+
+      .back-button
+        display inline-block
+        margin-right 16px
+
+        i
+          vertical-align middle
+          font-size 24px
+
+    .right
+      width 320px
+      text-align right
+
+  h1
+    display inline-block
+    margin 0px
+    padding 0px
+    font-size 18px
+    font-weight 100
+    vertical-align middle
+
+  button
+    height 32px
+    padding 0 16px
+    line-height 32px
+    background-color rgba(0, 0, 0, 0)
+    border none
+    color rgba(255, 255, 255, 0.5)
+    font-size 12px
+    cursor pointer
+
+    &:hover
+      background-color #444
+      color rgba(255, 255, 255, .9)
+
+  input.search
+    width 200px
+    padding 6px 8px
+    margin-right 16px
+    background-color #222
+    border none
+    outline 0
+    color rgba(255, 255, 255, 0.95)
+    font-size 14px
+
+    &:focus
+      background-color #444
+      
+    &::-webkit-input-placeholder
+      color: #777
+
+
+    
