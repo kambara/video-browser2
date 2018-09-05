@@ -241,6 +241,7 @@ export default {
     // Keyboard event
     //
     onKeydown(event) {
+      if (event.metaKey || event.ctrlKey) return
       switch(event.key) {
       case ' ':
         if (!event.repeat) {

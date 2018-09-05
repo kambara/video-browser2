@@ -38,10 +38,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 ## TODO
 
-優先度高
-
-- 検索
-
 優先度中
 
 - シーク直後にサムネイルをposter表示

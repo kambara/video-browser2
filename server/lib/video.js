@@ -1,5 +1,4 @@
 const crypto = require('crypto')
-const EventEmitter = require('events')
 const fs = require('fs-extra-promise')
 const os = require('os')
 const path = require('path')
@@ -8,22 +7,15 @@ const ffmpeg = require('fluent-ffmpeg')
 const Jimp = require('jimp')
 const debug = require('debug')('video-browser2:video')
 const debugFfmpeg = require('debug')('video-browser2:ffmpeg')
+const Entry = require('./entry')
 
-module.exports = class Video extends EventEmitter {
+module.exports = class Video extends Entry {
   constructor(relativePath) {
-    super()
+    super(relativePath)
     this.relativePath = relativePath
     this.thumbnailWidth = 160
     this.thumbnailHeight = 90
     this.spriteImageColumns = 10
-  }
-
-  getVideoPath() {
-    return path.join(config.videoRoot, this.relativePath)
-  }
-
-  basename() {
-    return path.basename(this.relativePath)
   }
 
   md5() {
@@ -34,7 +26,7 @@ module.exports = class Video extends EventEmitter {
 
   async getMetadata() {
     return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(this.getVideoPath(), (err, metadata) => {
+      ffmpeg.ffprobe(this.getAbsolutePath(), (err, metadata) => {
         if (err) {
           reject(err)
         } else {
@@ -72,6 +64,14 @@ module.exports = class Video extends EventEmitter {
     }
   }
 
+  async toJson() {
+    return {
+      type: 'video',
+      path: this.relativePath,
+      thumbnails: await this.getThumbnailsInfo()
+    }
+  }
+
   //
   // stream
   //
@@ -91,7 +91,7 @@ module.exports = class Video extends EventEmitter {
       }
     }
     res.contentType('video/mp4')
-    ffmpeg(this.getVideoPath())
+    ffmpeg(this.getAbsolutePath())
       .seekInput(time)
       .inputOptions(inputOptions)
       .format('mp4')
@@ -201,7 +201,7 @@ module.exports = class Video extends EventEmitter {
 
   createThumbnailAt(time) {
     return new Promise((resolve, reject) => {
-      ffmpeg(this.getVideoPath())
+      ffmpeg(this.getAbsolutePath())
         .seekInput(time)
         .format('image2')
         .noAudio()

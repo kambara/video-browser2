@@ -1,77 +1,71 @@
 const fs = require('fs-extra-promise')
 const path = require('path')
-const config = require('config')
-const flatten = require('arr-flatten')
+const Entry = require('./entry')
 const Video = require('./video')
 
-module.exports = class VideoDir {
+module.exports = class VideoDir extends Entry {
   constructor(relativePath) {
-    this.relativePath = relativePath
+    super(relativePath)
   }
 
-  getAbsolutePath() {
-    return path.join(config.videoRoot, this.relativePath)
+  async getEntries() {
+    const entries = (await fs.readdirAsync(this.getAbsolutePath()))
+      .filter(entry => !path.basename(entry).match(/^\./))
+      .map(entry => new Entry(path.join(this.relativePath, entry)))
+    const results = []
+    for (const entry of entries) {
+      const stats = await fs.statAsync(entry.getAbsolutePath())
+      if (stats.isDirectory()) {
+        results.push(new VideoDir(entry.relativePath))
+      } else if (this.isVideo(entry.basename())) {
+        results.push(new Video(entry.relativePath))
+      }
+    }
+    return results
   }
 
   async getVideos() {
-    const entries = await this.getEntries()
-    return entries
-      .filter(entry => this.isVideo(entry))
-      .map(entry => new Video(path.join(this.relativePath, entry)))
+    return (await this.getEntries())
+      .filter(entry => entry instanceof Video)
   }
 
   async getSubDirs() {
-    const subDirs = []
-    for (const entry of await this.getEntries()) {
-      const entryPath = path.join(this.getAbsolutePath(), entry)
-      const stats = await fs.statAsync(entryPath)
-      if (stats.isDirectory()) {
-        subDirs.push(
-          new VideoDir(path.join(this.relativePath, entry))
-        )
-      }
-    }
-    return subDirs
+    return (await this.getEntries())
+      .filter(entry => entry instanceof VideoDir)
   }
 
   async getVideosRecursive() {
-    let videos = await this.getVideos()
-    for (const videoDir of await this.getSubDirs()) {
-      const subDirVideos = await videoDir.getVideosRecursive()
-      videos = videos.concat(subDirVideos)
+    let videos = []
+    for (const entry of await this.getEntries()) {
+      if (entry instanceof Video) {
+        videos.push(entry)
+      } else if (entry instanceof VideoDir) {
+        videos = videos.concat(await entry.getVideosRecursive())
+      }
     }
     return videos
   }
 
-  async getEntries() {
-    const entries = await fs.readdirAsync(this.getAbsolutePath())
-    return entries.filter(entry => !path.basename(entry).match(/^\./))
-  }
-
-  async getEntriesInfo() {
-    const entries = await this.getEntries()
-    const entryList = []
-    for (const entry of entries) {
-      const entryRelativePath = path.join(this.relativePath, entry)
-      const stat = await fs.statAsync(path.join(this.getAbsolutePath(), entry))
-      if (stat.isDirectory()) {
-        const dir = new VideoDir(entryRelativePath)
-        const firstVideo = await dir.findFirstVideo()
-        entryList.push({
-          type: 'directory',
-          path: dir.relativePath,
-          thumbnails: firstVideo ? await firstVideo.getThumbnailsInfo() : null
-        })
-      } else if (this.isVideo(entryRelativePath)) {
-        const video = new Video(entryRelativePath)
-        entryList.push({
-          type: 'video',
-          path: video.relativePath,
-          thumbnails: await video.getThumbnailsInfo()
-        })
+  async searchEntries(query) {
+    let entries = []
+    for (const entry of await this.getEntries()) {
+      if (entry.match(query)) {
+        entries.push(entry)
+      }
+      if (entry instanceof VideoDir) {
+        entries = entries.concat(await entry.searchEntries(query))
       }
     }
-    return entryList
+    return entries
+  }
+
+  async toJson() {
+    const firstVideo = await this.findFirstVideo()
+    return {
+      type: 'directory',
+      path: this.relativePath,
+      thumbnails: firstVideo ? await firstVideo.getThumbnailsInfo() : null
+    }
   }
 
   async findFirstVideo() {
@@ -91,7 +85,7 @@ module.exports = class VideoDir {
   }
 
   async getRandomVideo() {
-    const videos = flatten(await this.getVideosRecursive())
+    const videos = await this.getVideosRecursive()
     if (videos.length === 0) {
       return null
     }

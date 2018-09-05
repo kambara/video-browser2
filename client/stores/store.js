@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueNativeSock from 'vue-native-websocket'
-import { ViewMode } from './enum'
+import { ViewMode } from '../enums/enum'
 
 Vue.use(Vuex)
 

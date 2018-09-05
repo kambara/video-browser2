@@ -23,11 +23,11 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
 <script>
 import Vue from 'vue'
 import Vuex from 'vuex'
-import VideoPlayer from './VideoPlayer'
-import SceneList from './SceneList'
-import ThumbnailerProgress from './ThumbnailerProgress'
+import VideoPlayer from '../components/VideoPlayer'
+import SceneList from '../components/SceneList'
+import ThumbnailerProgress from '../components/ThumbnailerProgress'
 import VideoPath from '../mixins/VideoPath'
-import { ViewMode } from '../enum.js'
+import { ViewMode } from '../enums/enum.js'
 
 Vue.use(Vuex)
 
@@ -119,6 +119,7 @@ export default {
     // Keyboard event
     //
     onKeydown(event) {
+      if (event.metaKey || event.ctrlKey) return
       switch(event.key) {
       case 'r':
         this.$router.push('/random')
