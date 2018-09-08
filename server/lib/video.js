@@ -226,14 +226,16 @@ module.exports = class Video extends Entry {
         .outputOptions([
           '-vframes 1',
           '-vsync 0',
+          '-qscale:v 5'
         ])
         .on('end', () => {
           resolve()
         })
         .on('error', (err) => {
+          debug('Error:', err.message)
           reject(err)
         })
-        // .on('stderr', stderr => debug(stderr))
+        // .on('stderr', stderr => debug('ffmpeg: ', stderr))
         .save(this.getThumbnailImagePath(time))
     })
   }
@@ -252,16 +254,16 @@ module.exports = class Video extends Entry {
         }
         for (let index = 0; index < imageCount; index++) {
           const imagePath = this.getThumbnailImagePath(index * config.sceneInterval)
+          const x = 160 * (index % this.spriteImageColumns)
+          const y = 90 * Math.floor(index / this.spriteImageColumns)
           try {
             const image = await Jimp.read(imagePath)
-            const x = 160 * (index % this.spriteImageColumns)
-            const y = 90 * Math.floor(index / this.spriteImageColumns)
             baseImage.blit(image, x, y)
           } catch (err) {
             return reject(err)
           }
         }
-        baseImage.quality(90)
+        baseImage.quality(70)
         baseImage.write(this.getSpriteImagePath())
         resolve()
       })

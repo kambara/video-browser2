@@ -1,15 +1,16 @@
 nav
-  padding 16px 0 16px 16px
+  padding 8px 8px 16px 16px
   font-size 20px
   background-color #333333
 
   .top
     display block
     text-align right
-    margin-bottom 16px
+    margin-bottom 32px
 
   .bottom
     display flex
+    margin-top 8px
 
     .left
       flex-grow 1
@@ -26,8 +27,7 @@ nav
           font-size 24px
 
     .right
-      width 320px
-      text-align right
+      margin-left 16px
 
   h1
     display inline-block
@@ -54,7 +54,7 @@ nav
   input.search
     width 200px
     padding 6px 8px
-    margin-right 16px
+    margin-right 8px
     background-color #222
     border none
     outline 0
@@ -63,9 +63,12 @@ nav
 
     &:focus
       background-color #444
+
+      &::-webkit-input-placeholder
+        color #666
       
     &::-webkit-input-placeholder
-      color: #777
+      color: #444
 
 
     
