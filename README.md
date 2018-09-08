@@ -38,9 +38,13 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 ## TODO
 
+優先度高
+
+- Middleモード
+- ページネーション
+
 優先度中
 
-- サムネイル画質調整
 - シーク直後にサムネイルをposter表示
 - シークバーサムネイル
 - タッチ操作
