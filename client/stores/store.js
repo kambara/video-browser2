@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueNativeSock from 'vue-native-websocket'
-import { ViewMode } from '../enums/enum'
+import { PlayerMode } from '../enums/enum'
 
 Vue.use(Vuex)
 
@@ -12,7 +12,7 @@ const store = new Vuex.Store({
       startTime: 0,
       spriteImagePath: null,
       sceneInterval: null,
-      viewMode: ViewMode.PLAYER,
+      playerMode: PlayerMode.MIDDLE,
     },
     socket: {
       isConnected: false,
@@ -47,8 +47,8 @@ const store = new Vuex.Store({
       state.video.sceneInterval = info.interval
       state.video.spriteImagePath = info.spriteImagePath
     },
-    setViewMode(state, viewMode) {
-      state.video.viewMode = viewMode
+    setPlayerMode(state, playerMode) {
+      state.video.playerMode = playerMode
     },
     SOCKET_THUMBNAILER_PROGRESS(state, info) {
       state.thumbnailerQueue = info.thumbnailerQueue
@@ -82,7 +82,7 @@ const store = new Vuex.Store({
   actions: {
     async initVideo({ commit }, path) {
       commit('setVideoStartTime', 0)
-      commit('setViewMode', ViewMode.PLAYER)
+      commit('setPlayerMode', PlayerMode.MIDDLE)
       if (path && path.length > 0) {
         const response = await fetch(`/api/video/info/${path}`)
         const json = await response.json()
@@ -92,17 +92,23 @@ const store = new Vuex.Store({
     startVideoAt({ commit }, time) {
       commit('setVideoStartTime', time)
     },
-    switchToPlayerMode({ commit }) {
-      commit('setViewMode', ViewMode.PLAYER)
+    //
+    // PlayerMode
+    //
+    switchToSmallMode({ commit }) {
+      commit('setPlayerMode', PlayerMode.SMALL)
     },
-    switchToSceneListMode({ commit }) {
-      commit('setViewMode', ViewMode.SCENE_LIST)
+    switchToMiddleMode({ commit }) {
+      commit('setPlayerMode', PlayerMode.MIDDLE)
     },
-    toggleViewMode({ commit, state }) {
-      if (state.video.viewMode === ViewMode.PLAYER) {
-        commit('setViewMode', ViewMode.SCENE_LIST)
+    switchToLargeMode({ commit }) {
+      commit('setPlayerMode', PlayerMode.LARGE)
+    },
+    togglePlayerMode({ commit, state }) {
+      if (state.video.playerMode === PlayerMode.LARGE) {
+        commit('setPlayerMode', PlayerMode.MIDDLE)
       } else {
-        commit('setViewMode', ViewMode.PLAYER)
+        commit('setPlayerMode', PlayerMode.LARGE)
       }
     },
   }

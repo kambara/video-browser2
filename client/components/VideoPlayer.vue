@@ -41,7 +41,7 @@
             | /
             | {{ formatTime($store.state.video.duration) }}
         .right
-          button(@click.stop="onViewModeButtonClick" v-if="!fullscreen")
+          button(@click.stop="onPlayerModeButtonClick" v-if="!fullscreen")
             i.material-icons view_comfy
           button(@click.stop="onFullscreenButtonClick")
             i.material-icons
@@ -231,10 +231,10 @@ export default {
       }
     },
     //
-    // ViewMode
+    // PlayerMode
     //
-    onViewModeButtonClick(event) {
-      this.$store.dispatch('toggleViewMode')
+    onPlayerModeButtonClick(event) {
+      this.$store.dispatch('togglePlayerMode')
       event.currentTarget.blur()
     },
     //
@@ -255,7 +255,7 @@ export default {
         break
       case 'v':
         if (!event.repeat) {
-          this.$store.dispatch('toggleViewMode')
+          this.$store.dispatch('togglePlayerMode')
         }
         break
       case 'ArrowRight':
@@ -347,7 +347,7 @@ export default {
 
     button
       display inline-block
-      width 48px
+      width 64px
       height 40px
       background-color rgba(0, 0, 0, 0)
       filter drop-shadow(0 0px 1px rgba(0, 0, 0, .9))

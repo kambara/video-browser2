@@ -35,6 +35,7 @@ export default {
         return
       }
       this.$store.dispatch('startVideoAt', time)
+      this.$store.dispatch('switchToMiddleMode')
     }
   }
 }
@@ -44,7 +45,7 @@ export default {
 ul
   list-style-type none
   padding 0
-  margin 0 16px 225px 16px
+  margin 16px
 
   li
     display inline-block

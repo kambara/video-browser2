@@ -1,4 +1,5 @@
-export const ViewMode = {
-  PLAYER: 0,
-  SCENE_LIST: 1,
+export const PlayerMode = {
+  SMALL: 0,
+  MIDDLE: 1,
+  LARGE: 2,
 }
