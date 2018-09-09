@@ -102,7 +102,7 @@ module.exports = class Video extends Entry {
       .audioBitrate(128)
       .outputOptions(['-movflags frag_keyframe+empty_moov'])
       .on('end', () => debug('Converted succesfully'))
-      .on('stderr', stderr => debugFfmpeg(stderr))
+      // .on('stderr', stderr => debugFfmpeg(stderr))
       .on('error', err => debug(err.message))
       .pipe(res, { end: true })
   }

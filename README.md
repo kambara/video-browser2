@@ -40,7 +40,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- Middleモード
 - ページネーション
 
 優先度中
