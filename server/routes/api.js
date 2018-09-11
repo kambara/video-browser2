@@ -10,8 +10,14 @@ const router = express.Router()
 //
 router.get('/dir/list/*', async (req, res) => {
   const videoDir = new VideoDir(req.params[0])
-  const entries = await videoDir.getEntries()
-  res.json(await map(entries, entry => entry.toJson()))
+  const { entries, totalCount } = await videoDir.getEntriesAndTotalCount(
+    req.query.limit ? parseInt(req.query.limit) : null,
+    req.query.offset ? parseInt(req.query.offset) : 0
+  )
+  res.json({
+    entries: await map(entries, entry => entry.toJson()),
+    totalCount: totalCount
+  })
 })
 
 //

@@ -59,6 +59,18 @@ module.exports = class VideoDir extends Entry {
     return entries
   }
 
+  async getEntriesAndTotalCount(limit, offset = 0) {
+    let entries = await this.getEntries()
+    const totalCount = entries.length
+    if (limit) {
+      entries = entries.slice(offset, offset + limit)
+    }
+    return {
+      entries,
+      totalCount
+    }
+  }
+
   async toJson() {
     const firstVideo = await this.findFirstVideo()
     return {
