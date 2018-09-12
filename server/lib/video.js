@@ -6,7 +6,6 @@ const config = require('config')
 const ffmpeg = require('fluent-ffmpeg')
 const Jimp = require('jimp')
 const debug = require('debug')('video-browser2:video')
-const debugFfmpeg = require('debug')('video-browser2:ffmpeg')
 const Entry = require('./entry')
 
 module.exports = class Video extends Entry {
@@ -203,6 +202,7 @@ module.exports = class Video extends Entry {
     return new Promise((resolve, reject) => {
       ffmpeg(this.getAbsolutePath())
         .seekInput(time)
+        .inputOptions(`-threads ${config.ffmpeg.thumbnailerThreads || 0}`)
         .format('image2')
         .noAudio()
         .videoFilters([
@@ -226,7 +226,7 @@ module.exports = class Video extends Entry {
         .outputOptions([
           '-vframes 1',
           '-vsync 0',
-          '-qscale:v 5'
+          '-qscale:v 5',
         ])
         .on('end', () => {
           resolve()
@@ -235,7 +235,7 @@ module.exports = class Video extends Entry {
           debug('Error:', err.message)
           reject(err)
         })
-        // .on('stderr', stderr => debug('ffmpeg: ', stderr))
+        // .on('stderr', stderr => debug('  ffmpeg: ', stderr))
         .save(this.getThumbnailImagePath(time))
     })
   }

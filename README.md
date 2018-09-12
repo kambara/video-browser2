@@ -40,7 +40,6 @@ In order to enable livereload, install browser extension for [Chrome](https://ch
 
 優先度高
 
-- サムネイル少しだけ生成
 - サムネイルキューに入っているものは追加しない
 - cronでサムネイル生成
 

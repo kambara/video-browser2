@@ -12,3 +12,4 @@ ffmpeg:
   vaapiEnabled: false
   vaapiDevice: /dev/dri/renderD128
   videoToolboxEnabled: false
+  thumbnailerThreads: 2
