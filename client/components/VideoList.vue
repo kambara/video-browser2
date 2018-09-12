@@ -46,10 +46,9 @@ export default {
 
 <style lang="stylus" scoped>
 ul
-  padding 0
+  margin 0
+  padding 16px
   list-style-type none
-  margin 16px
-  margin-bottom 80px
 
   li
     margin-bottom 16px
