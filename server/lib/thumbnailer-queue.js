@@ -11,6 +11,9 @@ const ThumbnailerQueue = {
     if (await video.existThumbnails()) {
       return false
     }
+    if (await isQueued(video)) {
+      return false
+    }
     queue.create('thumbnail', {
       title: video.basename(),
       relativePath: video.relativePath
@@ -29,16 +32,17 @@ const ThumbnailerQueue = {
 
 queue.process('thumbnail', async (job, done) => {
   const video = new Video(job.data.relativePath)
-  if (!await video.existThumbnails()) {
-    video.on('thumbnail-progress', (time, duration) => {
-      job.progress(time, duration)
-    })
-    try {
-      await video.createThumbnails()
-    } catch (err) {
-      console.error('Cannot create thumbnails:', err.message)
-      return done(err)
-    }
+  if (await video.existThumbnails()) {
+    return done()
+  }
+  video.on('thumbnail-progress', (time, duration) => {
+    job.progress(time, duration)
+  })
+  try {
+    await video.createThumbnails()
+  } catch (err) {
+    debug('Error: Cannot create thumbnails:', err.message)
+    return done(err)
   }
   done()
 })
@@ -96,6 +100,84 @@ function removeJobs(ids) {
   })
 }
 
+//
+// isJobAddedInQueue
+//
+function isQueued(video) {
+  return new Promise(async (resolve) => {
+    if (await isVideoContainedInJobIds(await getActiveJobIds(), video)
+      || await isVideoContainedInJobIds(await getInactiveJobIds(), video)
+      || await isVideoContainedInJobIds(await getCompleteJobIds(), video)
+      || await isVideoContainedInJobIds(await getFailedJobIds(), video)
+    ) {
+      return resolve(true)
+    }
+    resolve(false)
+  })
+}
+
+function isVideoContainedInJobIds(ids, video) {
+  return new Promise(async resolve => {
+    for (const id of ids) {
+      const job = await getJob(id)
+      if (job.data.relativePath === video.relativePath) {
+        return resolve(true)
+      }
+    }
+    resolve(false)
+  })
+}
+
+function getJob(id) {
+  return new Promise((resolve, reject) => {
+    kue.Job.get(id, (err, job) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(job)
+      }
+    })
+  })
+}
+
+//
+// Job IDs
+//
+function getInactiveJobIds() {
+  return new Promise(resolve => {
+    queue.inactive((err, ids) => {
+      resolve(ids)
+    })
+  })
+}
+
+function getActiveJobIds() {
+  return new Promise(resolve => {
+    queue.active((err, ids) => {
+      resolve(ids)
+    })
+  })
+}
+
+function getCompleteJobIds() {
+  return new Promise(resolve => {
+    queue.complete((err, ids) => {
+      resolve(ids)
+    })
+  })
+}
+
+function getFailedJobIds() {
+  return new Promise(resolve => {
+    queue.failed((err, ids) => {
+      resolve(ids)
+    })
+  })
+}
+
+//
+// Job count
+//
 function getInactiveCount() {
   return new Promise((resolve) => {
     queue.inactiveCount((err, total) => {
