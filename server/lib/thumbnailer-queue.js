@@ -7,6 +7,7 @@ const config = require('config')
 
 const queue = kue.createQueue()
 const emitter = new EventEmitter()
+const jobName = `thumbnail ${config.videoRoot}`
 
 const ThumbnailerQueue = {
   async add(video) {
@@ -18,7 +19,7 @@ const ThumbnailerQueue = {
       debug('Job has been already queued', video.basename())
       return false
     }
-    queue.create('thumbnail', {
+    queue.create(jobName, {
       title: video.basename(),
       relativePath: video.relativePath,
       videoRoot: config.videoRoot,
@@ -54,7 +55,7 @@ const ThumbnailerQueue = {
   },
 }
 
-queue.process('thumbnail', async (job, done) => {
+queue.process(jobName, async (job, done) => {
   const video = new Video(job.data.relativePath)
   if (await video.existThumbnails()) {
     return done()
@@ -94,7 +95,9 @@ queue.on('job progress', async (id, progress) => {
   })
 })
 
-queue.on('job complete', async () => {
+queue.on('job complete', async (id) => {
+  const job = await getJob(id)
+  if (job.data.videoRoot !== config.videoRoot) return
   emitter.emit('complete', {
     mutation: 'SOCKET_THUMBNAILER_COMPLETE'
   })
@@ -104,6 +107,24 @@ queue.on('job complete', async () => {
   }
 })
 
+//
+// getJob
+//
+function getJob(id) {
+  return new Promise((resolve, reject) => {
+    kue.Job.get(id, (err, job) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(job)
+      }
+    })
+  })
+}
+
+//
+// removeAllJobs
+//
 function removeAllJobs() {
   queue.complete((err, ids) => {
     removeJobs(ids)
@@ -125,7 +146,7 @@ function removeJobs(ids) {
 }
 
 //
-// isJobAddedInQueue
+// isQueued
 //
 function isQueued(video) {
   return new Promise(async (resolve) => {
@@ -149,18 +170,6 @@ function isVideoContainedInJobIds(ids, video) {
       }
     }
     resolve(false)
-  })
-}
-
-function getJob(id) {
-  return new Promise((resolve, reject) => {
-    kue.Job.get(id, (err, job) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(job)
-      }
-    })
   })
 }
 
