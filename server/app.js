@@ -35,6 +35,19 @@ app.use('/thumbnails', express.static(path.join(__dirname, 'data/thumbnails')))
 app.use('/api', apiRouter)
 app.use('/', indexRouter)
 
+// 404
+app.use((req, res, next) => {
+  next(createError(404))
+})
+
+// Error handler
+app.use((err, req, res) => {
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
+  res.status(err.status || 500)
+  res.render('error')
+})
+
 // WebSocket
 server.on('upgrade', function upgrade(request, socket, head) {
   const pathname = url.parse(request.url).pathname
@@ -57,18 +70,4 @@ if (config.thumbnailer
   }).start()
 }
 
-// 404
-app.use((req, res, next) => {
-  next(createError(404))
-})
-
-// Error handler
-app.use((err, req, res) => {
-  res.locals.message = err.message
-  res.locals.error = req.app.get('env') === 'development' ? err : {}
-  res.status(err.status || 500)
-  res.render('error')
-})
-
-// module.exports = app
 module.exports = {app, server}

@@ -2,8 +2,9 @@
 
 const {app, server} = require('../app')
 const debug = require('debug')('video-browser2:server')
+const config = require('config')
 
-const port = normalizePort(process.env.PORT || '3000')
+const port = normalizePort(process.env.PORT || config.port || '3000')
 app.set('port', port)
 server.listen(port)
 server.on('error', onError)
