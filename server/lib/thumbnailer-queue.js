@@ -3,6 +3,7 @@ const kue = require('kue')
 const Video = require('./video')
 const VideoDir = require('./video-dir')
 const debug = require('debug')('video-browser2:thumbnailer')
+const config = require('config')
 
 const queue = kue.createQueue()
 const emitter = new EventEmitter()
@@ -19,7 +20,8 @@ const ThumbnailerQueue = {
     }
     queue.create('thumbnail', {
       title: video.basename(),
-      relativePath: video.relativePath
+      relativePath: video.relativePath,
+      videoRoot: config.videoRoot,
     }).save((err) => {
       if (err) throw err
     })
@@ -69,6 +71,8 @@ queue.process('thumbnail', async (job, done) => {
 })
 
 queue.on('job progress', async (id, progress) => {
+  const job = await getJob(id)
+  if (job.data.videoRoot !== config.videoRoot) return
   const activeCount = await getActiveCount()
   const inactiveCount = await getInactiveCount()
   const completeCount = await getCompleteCount()
@@ -77,17 +81,15 @@ queue.on('job progress', async (id, progress) => {
     + inactiveCount
     + completeCount
     + failedCount
-  kue.Job.get(id, (err, job) => {
-    emitter.emit('progress', {
-      thumbnailerQueue: {
-        title: job.data.title,
-        progress: progress,
-        totalCount: totalCount,
-        completeCount: completeCount,
-        failedCount: failedCount,
-      },
-      mutation: 'SOCKET_THUMBNAILER_PROGRESS',
-    })
+  emitter.emit('progress', {
+    thumbnailerQueue: {
+      title: job.data.title,
+      progress: progress,
+      totalCount: totalCount,
+      completeCount: completeCount,
+      failedCount: failedCount,
+    },
+    mutation: 'SOCKET_THUMBNAILER_PROGRESS',
   })
 })
 
