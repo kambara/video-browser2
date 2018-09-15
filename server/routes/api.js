@@ -42,10 +42,15 @@ router.get('/video/info/*', async (req, res) => {
   })
 })
 
-router.get('/video/file/*', async (req, res) => {
+router.get('/video/stream/*', async (req, res) => {
   const video = new Video(req.params[0])
   const time = req.query.time ? parseInt(req.query.time) : 0
   video.stream(res, time)
+})
+
+router.get('/video/download/*', async (req, res) => {
+  const video = new Video(req.params[0])
+  res.download(video.getAbsolutePath())
 })
 
 //

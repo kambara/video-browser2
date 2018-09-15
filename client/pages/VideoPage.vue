@@ -7,6 +7,8 @@ div(@mousemove="onMouseMove" @wheel="onWheel")
           i.material-icons arrow_back
         h1 {{ basename(path) }}
       .right
+        button(@click="onDownloadButtonClick")
+          | Download
         button(@click="onRandomButtonClick")
           | Random
         button(@click="onCreateThumbnailsButtonClick")
@@ -91,6 +93,11 @@ export default {
       if (this.$store.state.video.playerMode === PlayerMode.SMALL) {
         this.$store.dispatch('switchToMiddleMode')
       }
+    },
+    onDownloadButtonClick() {
+      const link = document.createElement('a')
+      link.href = `/api/video/download/${this.path}`
+      link.click()
     },
     //
     // Mouse move event
