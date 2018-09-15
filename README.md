@@ -10,6 +10,7 @@
 ### Install
 
     yarn install
+    yarn global add pm2
 
 ## Config
 
@@ -18,29 +19,32 @@
 
 ## Run
 
-### Dev mode
+    yarn start
+
+Start service:
+
+    pm2 start app.json
+
+Startup:
+
+    pm2 startup
+    pm2 save
+
+## Development
 
     DEBUG=video-browser2:* yarn run dev
 
 In order to enable livereload, install browser extension for [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remotelivereload/)
 
-#### Just webpack
+Just webpack:
 
     yarn run webpack
 
-#### Kue Dashboard
+Kue Dashboard:
 
     yarn run kue-dashboard -p 3001
 
-### Production mode
-
-    yarn start
-
 ## TODO
-
-優先度高
-
-- ポート
 
 優先度中
 
