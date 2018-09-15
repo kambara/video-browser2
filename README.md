@@ -23,7 +23,7 @@
 
 Run as a service:
 
-    sudo pm2 start app.json
+    sudo pm2 start server/bin/www --name video-browser2
 
 Setup a startup script:
 
