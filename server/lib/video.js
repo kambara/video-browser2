@@ -202,7 +202,7 @@ module.exports = class Video extends Entry {
     return new Promise((resolve, reject) => {
       ffmpeg(this.getAbsolutePath())
         .seekInput(time)
-        .inputOptions(`-threads ${config.ffmpeg.thumbnailer.threads || 0}`)
+        .inputOptions(`-threads ${config.thumbnailer.threads || 0}`)
         .format('image2')
         .noAudio()
         .videoFilters([
