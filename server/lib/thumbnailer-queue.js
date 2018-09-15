@@ -1,13 +1,14 @@
 const EventEmitter = require('events').EventEmitter
 const kue = require('kue')
 const Video = require('./video')
+const VideoDir = require('./video-dir')
 const debug = require('debug')('video-browser2:thumbnailer')
 
 const queue = kue.createQueue()
 const emitter = new EventEmitter()
 
 const ThumbnailerQueue = {
-  async addJob(video) {
+  async add(video) {
     if (await video.existThumbnails()) {
       return false
     }
@@ -21,6 +22,24 @@ const ThumbnailerQueue = {
       if (err) throw err
     })
     return true
+  },
+  async addVideos(dirRelativePath) {
+    const videoDir = new VideoDir(dirRelativePath)
+    let jobCount = 0
+    for (const video of await videoDir.getVideos()) {
+      const isAdded = await this.add(video)
+      if (isAdded) jobCount++
+    }
+    return jobCount
+  },
+  async addVideosRecursively(dirRelativePath) {
+    const videoDir = new VideoDir(dirRelativePath)
+    let jobCount = 0
+    for (const video of await videoDir.getVideosRecursive()) {
+      const isAdded = await this.add(video)
+      if (isAdded) jobCount++
+    }
+    return jobCount
   },
   onProgress(callback) {
     emitter.on('progress', info => callback(info))

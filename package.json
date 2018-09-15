@@ -10,6 +10,7 @@
     "basic-auth": "^2.0.0",
     "config": "^2.0.1",
     "cookie-parser": "~1.4.3",
+    "cron": "^1.4.1",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "fluent-ffmpeg": "^2.1.2",
