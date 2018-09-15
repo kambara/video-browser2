@@ -21,14 +21,14 @@
 
     yarn start
 
-Start service:
+Run as a service:
 
-    pm2 start app.json
+    sudo pm2 start app.json
 
-Startup:
+Setup a startup script:
 
-    pm2 startup
-    pm2 save
+    sudo pm2 startup
+    sudo pm2 save
 
 ## Development
 
