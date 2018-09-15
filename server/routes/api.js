@@ -1,5 +1,6 @@
 const express = require('express')
 const { map } = require('p-iteration')
+const config = require('config')
 const Video = require('../lib/video')
 const VideoDir = require('../lib/video-dir')
 const ThumbnailerQueue = require('../lib/thumbnailer-queue')
@@ -38,7 +39,7 @@ router.get('/video/info/*', async (req, res) => {
   res.json({
     duration: metadata.format.duration,
     spriteImagePath: video.getSpriteImagePublicPath(),
-    interval: 10
+    interval: config.sceneInterval
   })
 })
 
