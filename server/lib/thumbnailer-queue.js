@@ -15,7 +15,7 @@ const ThumbnailerQueue = {
       return false
     }
     if (await isQueued(video)) {
-      debug('Thumbnails have been already queued', video.basename())
+      debug('Job has been already queued', video.basename())
       return false
     }
     queue.create('thumbnail', {
@@ -24,6 +24,7 @@ const ThumbnailerQueue = {
       videoRoot: config.videoRoot,
     }).save((err) => {
       if (err) throw err
+      debug('Job added:', video.basename())
     })
     return true
   },
