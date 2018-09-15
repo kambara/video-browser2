@@ -12,4 +12,6 @@ ffmpeg:
   vaapiEnabled: false
   vaapiDevice: /dev/dri/renderD128
   videoToolboxEnabled: false
-  thumbnailerThreads: 0
+thumbnailer:
+  cron: ""   # E.g. */30 * * * *
+  threads: 0

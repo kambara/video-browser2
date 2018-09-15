@@ -64,31 +64,21 @@ router.get('/random', async (req, res) => {
 //
 router.post('/video/thumbnails/create/*', async (req, res) => {
   const video = new Video(req.params[0])
-  const isAdded = await ThumbnailerQueue.addJob(video)
+  const isAdded = await ThumbnailerQueue.add(video)
   res.json({
     jobCount: isAdded ? 1 : 0
   })
 })
 
 router.post('/dir/thumbnails/create/*', async (req, res) => {
-  const videoDir = new VideoDir(req.params[0])
-  let jobCount = 0
-  for (const video of await videoDir.getVideos()) {
-    const isAdded = await ThumbnailerQueue.addJob(video)
-    if (isAdded) jobCount++
-  }
+  const jobCount = await ThumbnailerQueue.addVideos(req.params[0])
   res.json({
     jobCount: jobCount
   })
 })
 
 router.post('/dir/thumbnails/create-recursive/*', async (req, res) => {
-  const videoDir = new VideoDir(req.params[0])
-  let jobCount = 0
-  for (const video of await videoDir.getVideosRecursive()) {
-    const isAdded = await ThumbnailerQueue.addJob(video)
-    if (isAdded) jobCount++
-  }
+  const jobCount = await ThumbnailerQueue.addVideosRecursively(req.params[0])
   res.json({
     jobCount: jobCount
   })

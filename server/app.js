@@ -6,10 +6,14 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const stylus = require('stylus')
+const config = require('config')
+const cron = require('cron')
+
 const basicAuth = require('./basic-auth-ipfilter')
 const indexRouter = require('./routes/index')
 const apiRouter = require('./routes/api')
 const wss = require('./websocket')
+const ThumbnailerQueue = require('./lib/thumbnailer-queue')
 
 // Create app and server
 const app = express()
@@ -42,6 +46,16 @@ server.on('upgrade', function upgrade(request, socket, head) {
     socket.destroy()
   }
 })
+
+// Cron
+if (config.thumbnailer
+  && config.thumbnailer.cron
+  && config.thumbnailer.cron.length > 0
+) {
+  cron.job(config.thumbnailer.cron, async () => {
+    ThumbnailerQueue.addVideosRecursively('')
+  }).start()
+}
 
 // 404
 app.use((req, res, next) => {
