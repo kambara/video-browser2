@@ -1,6 +1,7 @@
 videoRoot: /path/to/video/folder
 title: VIDEO BROWSER
 port: 3000
+descending: false
 sceneInterval: 10
 basicAuth:
   name: my-name

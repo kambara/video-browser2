@@ -1,5 +1,6 @@
 const fs = require('fs-extra-promise')
 const path = require('path')
+const config = require('config')
 const Entry = require('./entry')
 const Video = require('./video')
 
@@ -20,6 +21,9 @@ module.exports = class VideoDir extends Entry {
       } else if (this.isVideo(entry.basename())) {
         results.push(new Video(entry.relativePath))
       }
+    }
+    if (config.descending) {
+      return results.reverse()
     }
     return results
   }
