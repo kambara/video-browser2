@@ -80,7 +80,7 @@ export default {
     src() {
       const path = this.$route.params[0]
       const sec = Math.floor(this.$store.state.video.startTime / 1000)
-      return `/api/video/file/${path}?time=${sec}`
+      return `/api/video/stream/${path}?time=${sec}`
     },
     currentTimeSec() {
       return Math.floor(this.currentTime / 1000)
