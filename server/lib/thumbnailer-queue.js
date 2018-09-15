@@ -10,9 +10,11 @@ const emitter = new EventEmitter()
 const ThumbnailerQueue = {
   async add(video) {
     if (await video.existThumbnails()) {
+      debug('Thumbnails already exist:', video.basename())
       return false
     }
     if (await isQueued(video)) {
+      debug('Thumbnails has been already queued', video.basename())
       return false
     }
     queue.create('thumbnail', {
