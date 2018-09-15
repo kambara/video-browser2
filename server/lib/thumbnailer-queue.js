@@ -14,7 +14,7 @@ const ThumbnailerQueue = {
       return false
     }
     if (await isQueued(video)) {
-      debug('Thumbnails has been already queued', video.basename())
+      debug('Thumbnails have been already queued', video.basename())
       return false
     }
     queue.create('thumbnail', {
