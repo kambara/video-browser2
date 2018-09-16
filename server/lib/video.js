@@ -203,7 +203,6 @@ module.exports = class Video extends Entry {
       ffmpeg(this.getAbsolutePath())
         .seekInput(time)
         .inputOptions(`-threads ${config.thumbnailer.threads || 0}`)
-        .format('image2')
         .noAudio()
         .videoFilters([
           {
