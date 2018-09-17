@@ -1,27 +1,17 @@
 <template lang="pug">
 ul
   li(v-for="(entry, index) in entries", :key="index")
-    .directory(v-if="entry.type == 'directory'")
-      router-link(:to="linkToList(entry.path)")
-        .scenes
-          div(v-if="entry.thumbnails && entry.thumbnails.count > 0")
-            img(
-              v-for="(path, index) in repScenes(entry.thumbnails)"
-              :src="path"
-            )
-        .title
-          .left {{ basename(entry.path) }}
-          i.material-icons chevron_right
-    .video(v-if="entry.type == 'video'")
-      router-link(:to="linkToVideo(entry.path)")
-        .scenes
-          div(v-if="entry.thumbnails && entry.thumbnails.count > 0")
-            img(
-              v-for="(path, index) in repScenes(entry.thumbnails)"
-              :src="path"
-            )
-        .title
-          | {{ basename(entry.path) }}
+    router-link(:to="linkToEntry(entry)" :class="entry.type")
+      .scenes
+        div(v-if="entry.thumbnails && entry.thumbnails.count > 0")
+          img.main(:src="mainScene(entry.thumbnails)")
+          img(
+            v-for="(path, index) in repScenes(entry.thumbnails)"
+            :src="path"
+          )
+      .title
+        .left {{ basename(entry.path) }}
+        i.material-icons(v-if="entry.type === 'directory'") chevron_right
 </template>
 
 <script>
@@ -33,6 +23,20 @@ export default {
     entries: Array
   },
   methods: {
+    linkToEntry(entry) {
+      switch(entry.type) {
+      case 'directory':
+        return this.linkToList(entry.path)
+      case 'video':
+        return this.linkToVideo(entry.path)
+      }
+      return ''
+    },
+    mainScene(thumbnails) {
+      const index = Math.floor(thumbnails.count * 1/3)
+      const sec = index * thumbnails.sceneInterval
+      return `${thumbnails.dirPath}/${sec}.jpg`
+    },
     repScenes(thumbnails) {
       const representativesCount = 4
       const results = []
@@ -63,10 +67,14 @@ ul
 
     a
       .scenes
-        min-height 90px * 2
+        min-height 90px * 4
+        background-color #202020
 
         img
           vertical-align top
+
+          &.main
+            width 160px * 2
 
       .title
         padding 8px 0
