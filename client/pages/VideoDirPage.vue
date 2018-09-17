@@ -52,7 +52,7 @@ export default {
       if (this.totalCount > 0
         && this.offset >= this.totalCount) return
       this.loading = true
-      const limit = 10
+      const limit = 12
       const response = await fetch(
         `/api/dir/list/${this.path}?limit=${limit}&offset=${this.offset}`
       )
