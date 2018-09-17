@@ -1,22 +1,27 @@
 <template lang="pug">
 ul
   li(v-for="(entry, index) in entries", :key="index")
-    div(v-if="entry.type == 'directory'")
+    .directory(v-if="entry.type == 'directory'")
       router-link(:to="linkToList(entry.path)")
+        .scenes
+          div(v-if="entry.thumbnails && entry.thumbnails.count > 0")
+            img(
+              v-for="(path, index) in repScenes(entry.thumbnails)"
+              :src="path"
+            )
         .title
-          i.material-icons video_library
-          | {{ basename(entry.path) }}
-        .scenes(v-if="entry.thumbnails && entry.thumbnails.count > 0")
-          img(v-for="(path, index) in repScenes(entry.thumbnails)"
-            :src="path")
-    div(v-if="entry.type == 'video'")
+          .left {{ basename(entry.path) }}
+          i.material-icons chevron_right
+    .video(v-if="entry.type == 'video'")
       router-link(:to="linkToVideo(entry.path)")
+        .scenes
+          div(v-if="entry.thumbnails && entry.thumbnails.count > 0")
+            img(
+              v-for="(path, index) in repScenes(entry.thumbnails)"
+              :src="path"
+            )
         .title
-          i.material-icons play_circle_filled
           | {{ basename(entry.path) }}
-        .scenes(v-if="entry.thumbnails.count > 0")
-          img(v-for="(path, index) in repScenes(entry.thumbnails)"
-            :src="path")
 </template>
 
 <script>
@@ -29,7 +34,7 @@ export default {
   },
   methods: {
     repScenes(thumbnails) {
-      const representativesCount = 6
+      const representativesCount = 4
       const results = []
       const replInterval = thumbnails.count / (representativesCount + 1)
       for (let i = 0; i < representativesCount; i++) {
@@ -46,33 +51,40 @@ export default {
 
 <style lang="stylus" scoped>
 ul
+  display flex
+  flex-wrap wrap
   margin 0
-  padding 16px
+  padding 8px
   list-style-type none
 
   li
-    margin-bottom 16px
+    flex-basis 160px * 2
+    margin 8px
 
     a
-      display: block
-
-      .title
-        margin 8px 0
-        font-size 14px
-        letter-spacing 0.03em
-        vertical-align middle
-        font-weight 100
-
-        i
-          margin-right 6px
-          vertical-align middle
-          font-size 24px
-
       .scenes
-        height 90px
-        overflow hidden
-        white-space nowrap
+        min-height 90px * 2
 
         img
           vertical-align top
+
+      .title
+        padding 8px 0
+        font-size 14px
+        letter-spacing 0.03em
+        line-height 1.4
+
+    .directory
+      .title
+        background-color #2f2f2f
+        padding 8px 12px
+        display flex
+        align-items center
+
+        .left
+          flex 1
+        
+        i
+          font-size 18px
+          margin-left 8px
 </style>
