@@ -69,6 +69,10 @@ ul
 
     a
       display block
+      color rgba(255, 255, 255, 0.6)
+
+      &:hover
+        color #34c6ff
 
       .scenes
         min-height 90px * 4
