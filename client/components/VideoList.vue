@@ -54,6 +54,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+item-shadow = 0 0 8px rgba(0, 0, 0, .2), 0 0 1px rgba(0, 0, 0, .3)
+
 ul
   display flex
   flex-wrap wrap
@@ -66,9 +68,12 @@ ul
     margin 8px
 
     a
+      display block
+
       .scenes
         min-height 90px * 4
         background-color #202020
+        box-shadow item-shadow
 
         img
           vertical-align top
@@ -84,8 +89,13 @@ ul
         line-height 1.4
 
     .directory
+      box-shadow item-shadow
+
+      .scenes
+        box-shadow none
+
       .title
-        background-color #2f2f2f
+        background-color #202020
         padding 8px 12px
         display flex
         align-items center

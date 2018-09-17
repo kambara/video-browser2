@@ -259,7 +259,7 @@ nav
     transition-duration 1.2s
     position relative
     z-index 2
-    box-shadow 0 5px 10px rgba(0, 0, 0, .7)
+    box-shadow 0 3px 6px rgba(0, 0, 0, .5)
     width 100%
 
     &.player-large
