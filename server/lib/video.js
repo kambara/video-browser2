@@ -60,6 +60,7 @@ module.exports = class Video extends Entry {
       dirPath: this.getThumbnailsDirPublicPath(),
       count: await this.getThumbnailsCount(),
       sceneInterval: config.sceneInterval,
+      representativeImage: this.getRepresentativeImagePublicPath(),
     }
   }
 
@@ -151,6 +152,28 @@ module.exports = class Video extends Entry {
   }
 
   //
+  // Representative image
+  //
+  getRepresentativeImagePublicPath() {
+    return path.join(
+      '/thumbnails',
+      this.md5(),
+      this.getRepresentativeImageFileName())
+  }
+
+  getRepresentativeImagePath() {
+    return path.join(
+      __dirname,
+      '../data/thumbnails/',
+      this.md5(),
+      this.getRepresentativeImageFileName())
+  }
+
+  getRepresentativeImageFileName() {
+    return 'representative.jpg'
+  }
+
+  //
   // Thumbnails count
   //
   async getThumbnailsCount() {
@@ -162,25 +185,19 @@ module.exports = class Video extends Entry {
   }
 
   //
-  // Create thumbnails
+  // Exist thumbnails
   //
-  async createThumbnails() {
-    debug('Creating thumbnails:', this.basename())
-    await fs.mkdirpAsync(this.getThumbnailsDirPath())
-    const metadata = await this.getMetadata()
-    const duration = Math.floor(metadata.format.duration)
-    for (let time = 0; time < duration; time += config.sceneInterval) {
-      await this.createThumbnailAt(time).catch(err => { throw err })
-      this.emit('thumbnail-progress', time, duration)
-    }
-    debug('Creating sprite image')
-    await this.createSpriteImage().catch(err => { throw err })
-    debug('Finish: ', this.getSpriteImagePath())
-  }
-
   async existThumbnails() {
     // Check directory
     if (!await fs.existsAsync(this.getThumbnailsDirPath())) {
+      return false
+    }
+    // Check representative image
+    if (!await fs.existsAsync(this.getRepresentativeImagePath())) {
+      return false
+    }
+    // Check sprite image
+    if (!await fs.existsAsync(this.getSpriteImagePath())) {
       return false
     }
     // Check thumbnails
@@ -191,15 +208,49 @@ module.exports = class Video extends Entry {
         return false
       }
     }
-    // Check sprite image
-    if (!await fs.existsAsync(this.getSpriteImagePath())) {
-      return false
-    }
     return true
   }
 
-  createThumbnailAt(time) {
-    return new Promise((resolve, reject) => {
+  //
+  // Create thumbnails
+  //
+  async createThumbnails() {
+    await fs.mkdirpAsync(this.getThumbnailsDirPath())
+    
+    // Interval
+    debug('Creating thumbnails:', this.basename())
+    const metadata = await this.getMetadata()
+    const duration = Math.floor(metadata.format.duration)
+    for (let time = 0; time < duration; time += config.sceneInterval) {
+      await this.createThumbnailAt(
+        time,
+        this.getThumbnailImagePath(time),
+        this.thumbnailWidth,
+        this.thumbnailHeight
+      ).catch(err => { throw err })
+      this.emit('thumbnail-progress', time, duration)
+    }
+
+    // Sprite image
+    debug('Creating sprite image')
+    await this.createSpriteImage().catch(err => { throw err })
+
+    // Representative scene
+    debug('Creating representative scene')
+    await this.createThumbnailAt(
+      Math.floor(duration * 2 / 3),
+      this.getRepresentativeImagePath(),
+      this.thumbnailWidth * 2,
+      this.thumbnailHeight * 2
+    ).catch(err => { throw err })
+    debug('Finish: ', this.getSpriteImagePath())
+  }
+
+  createThumbnailAt(time, file, width, height) {
+    return new Promise(async (resolve, reject) => {
+      if (await fs.existsAsync(file)) {
+        return resolve()
+      }
       ffmpeg(this.getAbsolutePath())
         .seekInput(time)
         .inputOptions(`-threads ${config.thumbnailer.threads || 0}`)
@@ -208,15 +259,15 @@ module.exports = class Video extends Entry {
           {
             filter: 'scale',
             options: [
-              `min(trunc(oh*a*sar/2)*2, ${this.thumbnailWidth})`,
-              this.thumbnailHeight
+              `min(trunc(oh*a*sar/2)*2, ${width})`,
+              height
             ]
           },
           {
             filter: 'pad',
             options: [
-              this.thumbnailWidth,
-              this.thumbnailHeight,
+              width,
+              height,
               '(ow-iw)/2',
               '(oh-ih)/2'
             ]
@@ -235,12 +286,15 @@ module.exports = class Video extends Entry {
           reject(err)
         })
         // .on('stderr', stderr => debug('  ffmpeg: ', stderr))
-        .save(this.getThumbnailImagePath(time))
+        .save(file)
     })
   }
 
   async createSpriteImage() {
     return new Promise(async (resolve, reject) => {
+      if (await fs.existsAsync(this.getSpriteImagePath())) {
+        return resolve()
+      }
       const metadata = await this.getMetadata()
       const duration = Math.floor(metadata.format.duration)
       const imageCount = Math.ceil(duration / config.sceneInterval)
