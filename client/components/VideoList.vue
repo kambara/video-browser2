@@ -4,7 +4,7 @@ ul
     router-link(:to="linkToEntry(entry)" :class="entry.type")
       .scenes
         div(v-if="entry.thumbnails && entry.thumbnails.count > 0")
-          img.main(:src="mainScene(entry.thumbnails)")
+          img.representative(:src="entry.thumbnails.representativeImage")
           img(
             v-for="(path, index) in repScenes(entry.thumbnails)"
             :src="path"
@@ -73,8 +73,9 @@ ul
         img
           vertical-align top
 
-          &.main
+          &.representative
             width 160px * 2
+            height 90px * 2
 
       .title
         padding 8px 0
