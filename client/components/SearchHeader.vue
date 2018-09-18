@@ -42,5 +42,5 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@import "../styles/video-list.styl"
+@import "../styles/video-list-header.styl"
 </style>

@@ -60,16 +60,17 @@ ul
   display flex
   flex-wrap wrap
   margin 0
-  padding 8px
+  padding 16px
   list-style-type none
 
   li
     flex-basis 160px * 2
-    margin 8px
+    margin 16px
 
     a
       display block
       color rgba(255, 255, 255, 0.6)
+      // color rgba(0, 0, 0, .6)
 
       &:hover
         color #34c6ff
