@@ -200,17 +200,23 @@ nav
   filter drop-shadow(0 0 1px rgba(0, 0, 0, .9))
 
   .left
-    flex-grow 1
+    flex 1 0
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+    height = 40px
 
     .back-button
       display inline-block
       width 48px
-      height 40px
-      line-height 40px
+      height height
+      line-height height
       text-align center
       font-size 18px
+      color rgba(255, 255, 255, 0.9)
 
       &:hover
+        color #34c6ff
         background-color rgba(0, 0, 0, 0.6)
         transition: .4s
 
@@ -222,13 +228,17 @@ nav
       margin 0
       margin-left 8px
       padding 0
-      height 40px
-      line-height 40px
+      height height
+      line-height height
       font-size 14px
       letter-spacing 0.03em
       font-weight normal
+      color rgba(255, 255, 255, 0.9)
 
   .right
+    width 340px
+    text-align right
+
     button
       height 32px
       padding 0 16px
@@ -310,6 +320,7 @@ nav
     transition-property all
     transition-duration 1.2s
     z-index 1
+    background-color #333
 
     &.player-large
       height 0

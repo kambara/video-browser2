@@ -54,7 +54,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-item-shadow = 0 0 8px rgba(0, 0, 0, .2), 0 0 1px rgba(0, 0, 0, .3)
+item-shadow = 0 0 6px rgba(0, 0, 0, .1), 0 0 1px rgba(0, 0, 0, .2)
 
 ul
   display flex
@@ -69,14 +69,13 @@ ul
 
     a
       display block
-      color rgba(255, 255, 255, 0.7)
+      color rgba(0, 0, 0, 0.8)
 
       &:hover
-        color #34c6ff
+        color #0a95ff
 
       .scenes
         min-height 90px * 4
-        background-color #202020
         box-shadow item-shadow
 
         img
@@ -87,20 +86,25 @@ ul
             height 90px * 2
 
       .title
-        padding 8px 0
-        font-size 14px
+        padding 12px 0 0 0
+        font-size 16px
+        font-weight bold
         letter-spacing 0.02em
-        line-height 1.5
+        line-height 1.45
 
     .directory
       box-shadow item-shadow
+      color rgba(255, 255, 255, 0.9)
+
+      &:hover
+        color #34c6ff
 
       .scenes
         box-shadow none
 
       .title
-        background-color #202020
-        padding 8px 12px
+        background-color #444
+        padding 12px 8px 12px 14px
         display flex
         align-items center
 
@@ -108,6 +112,6 @@ ul
           flex 1
         
         i
-          font-size 18px
+          font-size 24px
           margin-left 8px
 </style>

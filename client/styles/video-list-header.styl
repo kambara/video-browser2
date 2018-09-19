@@ -1,7 +1,6 @@
 nav
-  padding 8px 24px 0px 32px
+  padding 8px 24px 8px 32px
   font-size 20px
-  // background-color #202020
 
   .top
     display block
@@ -17,6 +16,7 @@ nav
       white-space nowrap
       overflow hidden
       text-overflow ellipsis
+      height = 36px
 
       .back-button
         display inline-block
@@ -24,17 +24,21 @@ nav
 
         i
           vertical-align middle
-          font-size 24px
+          font-size height
+
+      h1
+        display inline-block
+        margin 0px
+        padding 0px
+        height height
+        line-height height
+        font-size 28px
+        vertical-align middle
 
     .right
       margin-left 16px
 
-  h1
-    display inline-block
-    margin 0px
-    padding 0px
-    font-size 18px
-    vertical-align middle
+  
 
   button
     height 32px
@@ -42,29 +46,29 @@ nav
     line-height 32px
     background-color rgba(0, 0, 0, 0)
     border none
-    color rgba(255, 255, 255, 0.5)
+    color rgba(0, 0, 0, 0.4)
     font-size 12px
     cursor pointer
 
     &:hover
-      background-color #444
-      color rgba(255, 255, 255, .9)
+      background-color #efefef
+      color rgba(0, 0, 0, .9)
 
   input.search
     width 200px
-    padding 6px 8px
+    padding 8px 12px
     margin-right 8px
-    background-color #333
+    background-color #efefef
     border none
     outline 0
-    color rgba(255, 255, 255, 0.95)
-    font-size 14px
+    color rgba(0, 0, 0, 0.9)
+    font-size 16px
 
     &::-webkit-input-placeholder
-      color: #666
+      color: rgba(0, 0, 0, 0.2)
 
     &:focus
-      background-color #111
+      background-color #ddd
 
       &::-webkit-input-placeholder
-        color #444
+        color rgba(0, 0, 0, 0.25)
