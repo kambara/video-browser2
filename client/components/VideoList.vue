@@ -69,8 +69,7 @@ ul
 
     a
       display block
-      color rgba(255, 255, 255, 0.6)
-      // color rgba(0, 0, 0, .6)
+      color rgba(255, 255, 255, 0.7)
 
       &:hover
         color #34c6ff
@@ -90,8 +89,8 @@ ul
       .title
         padding 8px 0
         font-size 14px
-        letter-spacing 0.03em
-        line-height 1.4
+        letter-spacing 0.02em
+        line-height 1.5
 
     .directory
       box-shadow item-shadow
