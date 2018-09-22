@@ -87,9 +87,10 @@ ul
 
       .title
         padding-top 14px
-        font-size 16px
+        font-size 18px
         letter-spacing 0.02em
         line-height 1.45
+        max-height 100%
 
     .directory
       box-shadow item-shadow
