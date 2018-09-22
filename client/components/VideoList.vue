@@ -69,7 +69,7 @@ ul
 
     a
       display block
-      color rgba(0, 0, 0, 0.8)
+      color rgba(0, 0, 0, 0.9)
 
       &:hover
         color #0a95ff
@@ -86,9 +86,8 @@ ul
             height 90px * 2
 
       .title
-        padding 12px 0 0 0
+        padding-top 14px
         font-size 16px
-        font-weight bold
         letter-spacing 0.02em
         line-height 1.45
 
@@ -104,7 +103,7 @@ ul
 
       .title
         background-color #444
-        padding 12px 8px 12px 14px
+        padding 14px 8px 14px 16px
         display flex
         align-items center
 
