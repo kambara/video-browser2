@@ -3,10 +3,9 @@ ul
   li(v-for="(entry, index) in entries", :key="index")
     router-link(:to="linkToEntry(entry)" :class="entry.type")
       .scenes
-        div(v-if="entry.thumbnails && entry.thumbnails.count > 0")
-          img.representative(:src="entry.thumbnails.representativeImage")
+        div(v-if="entry.thumbnailsDir")
           img(
-            v-for="(path, index) in repScenes(entry.thumbnails)"
+            v-for="(path, index) in highlightImages(entry.thumbnailsDir)"
             :src="path"
           )
       .title
@@ -32,20 +31,10 @@ export default {
       }
       return ''
     },
-    mainScene(thumbnails) {
-      const index = Math.floor(thumbnails.count * 1/3)
-      const sec = index * thumbnails.sceneInterval
-      return `${thumbnails.dirPath}/${sec}.jpg`
-    },
-    repScenes(thumbnails) {
-      const representativesCount = 4
+    highlightImages(thumbnailsDir) {
       const results = []
-      const replInterval = thumbnails.count / (representativesCount + 1)
-      for (let i = 0; i < representativesCount; i++) {
-        const index = Math.floor((i + 1) * replInterval)
-        const sec = index * thumbnails.sceneInterval
-        const imagePath = `${thumbnails.dirPath}/${sec}.jpg`
-        results.push(imagePath)
+      for (let i = 0; i < 5; i++) {
+        results.push(`${thumbnailsDir}/${i}.jpg`)
       }
       return results
     },
@@ -80,8 +69,10 @@ ul
 
         img
           vertical-align top
+          width 160px
+          height 90px
 
-          &.representative
+          &:first-of-type
             width 160px * 2
             height 90px * 2
 

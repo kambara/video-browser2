@@ -80,7 +80,7 @@ module.exports = class VideoDir extends Entry {
     return {
       type: 'directory',
       path: this.relativePath,
-      thumbnails: firstVideo ? await firstVideo.getThumbnailsInfo() : null
+      thumbnailsDir: firstVideo ? await firstVideo.getHighlightImagesDirPublicPathIfExist() : null
     }
   }
 
