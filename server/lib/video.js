@@ -365,7 +365,7 @@ module.exports = class Video extends Entry {
     await fs.mkdirpAsync(this.getHighlightTempDirPath())
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
-    for (let time = 0; time < duration; time += 5) {
+    for (let time = 0; time < duration; time += 10) {
       await this.createThumbnailAt(
         time,
         this.getHighlightTempImagePath(time),
