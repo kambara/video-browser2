@@ -365,7 +365,7 @@ module.exports = class Video extends Entry {
     await fs.mkdirpAsync(this.getHighlightTempDirPath())
     const metadata = await this.getMetadata()
     const duration = Math.floor(metadata.format.duration)
-    for (let time = 0; time < duration; time += 5) {
+    for (let time = 0; time < duration; time += 10) {
       await this.createThumbnailAt(
         time,
         this.getHighlightTempImagePath(time),
@@ -379,72 +379,114 @@ module.exports = class Video extends Entry {
   }
 
   async extractHighlightImages() {
-    const files = await fs.readdirAsync(this.getHighlightTempDirPath())
+    let data = await this.getImageData()
+    data = this.removePoorImages(data)
+    const clusters = this.clusterData(data).slice(0, 5)
+    return await this.chooseCenterImageOfEachCluster(clusters)
+  }
+
+  async chooseCenterImageOfEachCluster(clusters) {
+    const highlightImageTimes = clusters.map(cluster => {
+      const features = cluster.data.map(datum => datum.feature)
+      const centroidIndex = nearestVector(features, cluster.centroid)
+      return cluster.data[centroidIndex].time
+    })
+    // Sort
+    const bestImageTime = highlightImageTimes.shift()
+    highlightImageTimes.sort((a, b) => a - b)
+    highlightImageTimes.unshift(bestImageTime)
+    // Time to image
     const images = []
-    for (const fileName of files) {
-      if (!fileName.match(/\.jpg$/)) continue
-      const image = await Image.load(path.join(this.getHighlightTempDirPath(), fileName))
-      if (this.isInformativeImage(image)) {
-        images.push(image)
-      }
+    for (const time of highlightImageTimes) {
+      const image = await Image.load(path.join(this.getHighlightTempDirPath(), `${time}.jpg`))
+      images.push(image)
     }
-    const clusters = this.clusterImages(images)
-    const highlightImages = clusters.map(cluster => {
-      const centroid = cluster.centroid
-      const centroidIndex = nearestVector(cluster.histograms, centroid)
-      return cluster.images[centroidIndex]
-    })
-    return highlightImages
+    return images
   }
 
-  isInformativeImage(image) {
-    const hslImage = image.hsl()
-    const lightnessHist = hslImage.getHistogram({
-      channel: 2,
-      maxSlots: 256,
-      useAlpha: false
-    })
-    const lightnessMaxValue = Math.max.apply(null, lightnessHist)
-    const lowValueCount = lightnessHist
-      .map(value => 100 * (value/lightnessMaxValue))
-      .filter(value => (value <= 1))
-      .length
-    return (lowValueCount < 80)
-  }
-
-  clusterImages(images) {
-    const hueHistograms = images.map(image => {
-      return image.hsl().getHistogram({
+  async getImageData() {
+    const files = (await fs.readdirAsync(this.getHighlightTempDirPath()))
+      .filter(file => file.match(/\.jpg$/))
+    const data = []
+    for (const fileName of files) {
+      const time = parseInt( fileName.match(/(\d+)\.jpg/)[1] )
+      const image = await Image.load(path.join(this.getHighlightTempDirPath(), fileName))
+      const hslImage = image.hsl()
+      const hueHist = hslImage.getHistogram({
         channel: 0,
         maxSlots: 256,
         useAlpha: false
       })
+      const lightnessHist = hslImage.getHistogram({
+        channel: 2,
+        maxSlots: 256,
+        useAlpha: false
+      })
+      data.push({
+        time,
+        hueHistogram: this.normalizeHistogram(hueHist),
+        lightnessHistogram: this.normalizeHistogram(lightnessHist),
+      })
+    }
+    // Sort by time
+    data.sort((a, b) => a.time - b.time)
+    // Combine hue and time
+    const timeWeight = 4
+    const maxTime = Math.max.apply(null, data.map(datum => datum.time))
+    for (const datum of data) {
+      const hist = datum.hueHistogram
+      const time = timeWeight * 100 * datum.time / maxTime
+      hist.unshift(time)
+      datum.feature = hist
+    }
+    return data
+  }
+
+  normalizeHistogram(hist) {
+    const maxValue = Math.max.apply(null, hist)
+    return hist.map(value => 100 * (value / maxValue))
+  }
+
+  removePoorImages(data) {
+    // Trim first and last
+    if (data.length > 160) {
+      data = data.slice(20, -30)
+    } else if (data.length > 10) {
+      data = data.slice(1, -1)
+    }
+    // Filter by lightness
+    return data.filter(datum => {
+      const lowValueCount = datum
+        .lightnessHistogram
+        .filter(value => (value <= 1))
+        .length
+      return (lowValueCount < 90)
     })
-    const answer = this.iterateKmeans(hueHistograms, 7)
+  }
+
+  clusterData(data) {
+    // const answer = kmeans(data.map(datum => datum.feature), 8)
+    const answer = this.iterateKmeans(data.map(datum => datum.feature), 8)
     const clusters = []
-    for (let i = 0; i < answer.clusters.length; i++) {
-      const clusterId = answer.clusters[i]
+    answer.clusters.forEach((clusterId, index) => {
       if (!clusters[clusterId]) {
         clusters[clusterId] = {
+          clusterId: clusterId,
           centroid: answer.centroids[clusterId].centroid,
-          images: [],
-          histograms: []
+          data: []
         }
       }
-      clusters[clusterId].images.push(images[i])
-      clusters[clusterId].histograms.push(hueHistograms[i])
-    }
-    clusters.sort((a, b) => {
-      return b.images.length - a.images.length
+      clusters[clusterId].data.push(data[index])
     })
+    clusters.sort((a, b) => b.data.length - a.data.length)
     return clusters
   }
 
-  iterateKmeans(histograms, k) {
+  iterateKmeans(features, k) {
     let bestAnswer = null
     let minErrorCount = 0
     for (let i = 0; i < 10; i++) {
-      const answer = kmeans(histograms, k)
+      const answer = kmeans(features, k)
       const errorCount = answer.centroids
         .reduce((total, centroid) => {
           return total + centroid.error
