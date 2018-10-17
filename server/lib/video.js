@@ -465,7 +465,6 @@ module.exports = class Video extends Entry {
   }
 
   clusterData(data) {
-    // const answer = kmeans(data.map(datum => datum.feature), 8)
     const answer = this.iterateKmeans(data.map(datum => datum.feature), 8)
     const clusters = []
     answer.clusters.forEach((clusterId, index) => {
