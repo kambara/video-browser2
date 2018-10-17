@@ -205,7 +205,7 @@ module.exports = class Video extends Entry {
       return false
     }
     const highlightImageFiles = await fs.readdirAsync(this.getHighlightImagesDirPath())
-    if (highlightImageFiles.filter(file => file.includes('.jpg')).length < 7) {
+    if (highlightImageFiles.filter(file => file.includes('.jpg')).length < 5) {
       return false
     }
     // Check interval images
