@@ -38,24 +38,35 @@ module.exports = class Video extends Entry {
     })
   }
 
-  async getVideoCodec() {
+  async is10bitVideo() {
     const metadata = await this.getMetadata()
     for (const stream of metadata.streams) {
       if (stream.codec_type === 'video') {
+        return (
+          stream.bits_per_raw_sample &&
+          stream.bits_per_raw_sample === 10
+        )
+      }
+    }
+    return false
+  }
+
+  async getCodec(codecType) {
+    const metadata = await this.getMetadata()
+    for (const stream of metadata.streams) {
+      if (stream.codec_type === codecType) {
         return stream.codec_name
       }
     }
     return null
   }
 
+  async getVideoCodec() {
+    return await this.getCodec('video')
+  }
+
   async getAudioCodec() {
-    const metadata = await this.getMetadata()
-    for (const stream of metadata.streams) {
-      if (stream.codec_type === 'audio') {
-        return stream.codec_name
-      }
-    }
-    return null
+    return await this.getCodec('audio')
   }
 
   async getThumbnailsCount() {
@@ -78,11 +89,18 @@ module.exports = class Video extends Entry {
   // stream
   //
   async stream(res, time = 0) {
-    const streamAudioCodec = (await this.getAudioCodec() === 'aac') ? 'copy' : 'aac'
-    let streamVideoCodec = (await this.getVideoCodec() === 'h264') ? 'copy' : 'libx264'
+    const streamAudioCodec = (await this.getAudioCodec() === 'aac')
+      ? 'copy'
+      : 'aac'
+    let streamVideoCodec = 'libx264'
+    if (await this.getVideoCodec() === 'h264'
+        && !await this.is10bitVideo()) {
+      streamVideoCodec = 'copy'
+    }
+
+    // Hardware Acceleration
     const inputOptions = []
     const videoFilters = []
-    // Hardware Acceleration
     if (streamVideoCodec !== 'copy') {
       if (config.ffmpeg.vaapiEnabled && os.type() === 'Linux') {
         streamVideoCodec = 'h264_vaapi'
@@ -92,6 +110,7 @@ module.exports = class Video extends Entry {
         streamVideoCodec = 'h264_videotoolbox'
       }
     }
+
     res.contentType('video/mp4')
     ffmpeg(this.getAbsolutePath())
       .seekInput(time)
@@ -102,7 +121,9 @@ module.exports = class Video extends Entry {
       .videoFilters(videoFilters)
       .audioCodec(streamAudioCodec)
       .audioBitrate(128)
-      .outputOptions(['-movflags frag_keyframe+empty_moov'])
+      .outputOptions([
+        '-movflags frag_keyframe+empty_moov'
+      ])
       .on('end', () => debug('Converted succesfully'))
       // .on('stderr', stderr => debugFfmpeg(stderr))
       .on('error', err => debug(err.message))
