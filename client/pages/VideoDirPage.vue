@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     path() {
-      return this.$route.params[0] || ''
+      return this.$route.params.pathMatch || ''
     }
   },
   watch: {
