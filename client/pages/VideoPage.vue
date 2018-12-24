@@ -59,6 +59,7 @@ export default {
       case PlayerMode.LARGE:
         return 'player-large'
       }
+      return ''
     }
   },
   watch: {
