@@ -10,6 +10,9 @@
     @playing="onVideoPlaying"
     @pause="onVideoPause"
     @ended="onVideoEnded"
+    @touchstart="onVideoTouchStart"
+    @touchmove="onVideoTouchMove"
+    @touchend="onVideoTouchEnd"
   )
   transition(name="fade")
     .controls(v-if="controlVisibility")
@@ -155,9 +158,11 @@ export default {
     },
     onVideoPause(event) {
       this.paused_ = event.currentTarget.paused
+      this.showControl()
     },
     onVideoPlaying(event) {
       this.paused_ = event.currentTarget.paused
+      this.hideControlLater()
     },
     onVideoEnded () {
       this.pause()
@@ -165,6 +170,10 @@ export default {
     onVideoMouseMove () {
       this.showAndHideControlLater()
     },
+
+    //
+    // Show/Hide control
+    //
     showControl() {
       this.controlVisibility = true
       if (this.timeoutIdOfHideControl) {
@@ -181,6 +190,35 @@ export default {
       if (!this.paused) {
         this.hideControlLater()
       }
+    },
+
+    //
+    // Seek by Touch Move
+    //
+    onVideoTouchStart(event) {
+      this.touchStartX = event.targetTouches[0].clientX
+      this.touchStartTime = this.currentTime
+    },
+    onVideoTouchMove(event) {
+      const inactiveRange = 20
+      const distance = event.targetTouches[0].clientX - this.touchStartX
+      if (Math.abs(distance) < inactiveRange) return
+      // Start seeking
+      if (!this.seeking) {
+        this.seeking = true
+        if (this.loaded) {
+          this.autoPlay = !this.paused
+        }
+        this.pause()
+      }
+      const offsetSec = 0.2 * (distance - inactiveRange * (distance / Math.abs(distance)))
+      const time = this.touchStartTime + offsetSec * 1000
+      this.currentTime = (time >= 0) ? time : 0
+    },
+    onVideoTouchEnd() {
+      if (!this.seeking) return
+      this.$store.dispatch('startVideoAt', this.currentTime)
+      this.seeking = false
     },
     //
     // Seek bar
