@@ -78,7 +78,7 @@ export default {
       return this.paused_
     },
     src() {
-      const path = this.$route.params[0]
+      const path = this.$route.params.pathMatch
       const sec = Math.floor(this.$store.state.video.startTime / 1000)
       return `/api/video/stream/${path}?time=${sec}`
     },

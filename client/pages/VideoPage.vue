@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     path() {
-      return this.$route.params[0] || ''
+      return this.$route.params.pathMatch || ''
     },
     playerSizeClass() {
       switch(this.$store.state.video.playerMode) {
@@ -59,6 +59,7 @@ export default {
       case PlayerMode.LARGE:
         return 'player-large'
       }
+      return ''
     }
   },
   watch: {
