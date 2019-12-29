@@ -19,16 +19,14 @@ Setup:
 
     cd backend
     yarn install
+    yarn global add pm2
 
-Start server:
+Run:
 
-    cd backend
     yarn start
 
 Run as a service:
 
-    cd backend
-    yarn global add pm2
     sudo pm2 start src/main.js --name video-browser2
 
 Setup a startup script:
@@ -45,14 +43,12 @@ Setup:
     cd backend
     yarn install
 
-API Server:
+Run:
 
-    cd backend
     DEBUG=video-browser2:* yarn start:dev
 
 Kue Dashboard:
 
-    cd backend
     yarn run kue-dashboard -p 3001
 
 ### Frontend
@@ -62,14 +58,12 @@ Setup:
     cd frontend
     yarn install
 
-Dev Server:
+Run:
 
-    cd frontend
     yarn serve
 
 Build:
 
-    cd frontend
     yarn build
 
 ## TODO
