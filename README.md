@@ -7,23 +7,29 @@
 - Redis
 - Yarn
 
-### Install
-
-    yarn install
-    yarn global add pm2
-
 ## Config
 
+    cd backend
     cp config/default.yaml.sample config/default.yaml
     vi config/default.yaml
 
-## Run
+## Production
 
+Setup:
+
+    cd backend
+    yarn install
+
+Start server:
+
+    cd backend
     yarn start
 
 Run as a service:
 
-    sudo pm2 start server/bin/www --name video-browser2
+    cd backend
+    yarn global add pm2
+    sudo pm2 start src/main.js --name video-browser2
 
 Setup a startup script:
 
@@ -32,17 +38,39 @@ Setup a startup script:
 
 ## Development
 
-    DEBUG=video-browser2:* yarn run dev
+### Backend
 
-In order to enable livereload, install browser extension for [Chrome](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/remotelivereload/)
+Setup:
 
-Just webpack:
+    cd backend
+    yarn install
 
-    yarn run webpack
+API Server:
+
+    cd backend
+    DEBUG=video-browser2:* yarn start:dev
 
 Kue Dashboard:
 
+    cd backend
     yarn run kue-dashboard -p 3001
+
+### Frontend
+
+Setup:
+
+    cd frontend
+    yarn install
+
+Dev Server:
+
+    cd frontend
+    yarn serve
+
+Build:
+
+    cd frontend
+    yarn build
 
 ## TODO
 
